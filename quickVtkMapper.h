@@ -9,7 +9,6 @@ namespace quick { namespace vtk {
 class Mapper : public AbstractMapper3D
 {
     Q_OBJECT
-    Q_CLASSINFO("DefaultProperty", "mapper");
 public:
 
     enum class ScalarMode {

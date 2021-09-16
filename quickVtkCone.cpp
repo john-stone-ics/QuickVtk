@@ -66,6 +66,8 @@ void Cone::setAngle(qreal v)
 
 Cone::vtkUserData Cone::initializeVTK(WeakDispatcherPtr weakDispatcher, vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
+    qDebug() << Q_FUNC_INFO << m_vtkInitialized;
+
     auto vtk = vtkNew<MyVtkData>(this, weakDispatcher, renderData);
 
     vtk->cone = vtkCone::New();

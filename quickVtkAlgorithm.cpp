@@ -42,6 +42,8 @@ QQmlListProperty<Algorithm> Algorithm::input()
 
 Algorithm::vtkUserData Algorithm::initializeVTK(WeakDispatcherPtr weakDispatcher, vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
+    qDebug() << Q_FUNC_INFO << m_vtkInitialized;
+
     auto vtk = vtkNew<MyVtkData>(this, weakDispatcher, renderData);
 
     vtk->algorithm = makeAlgorithm();

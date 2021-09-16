@@ -122,6 +122,8 @@ void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
 
 Actor::vtkUserData Actor::initializeVTK(WeakDispatcherPtr weakDispatcher, vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
+    qDebug() << Q_FUNC_INFO << m_vtkInitialized;
+
     auto vtk = vtkNew<MyVtkData>(this, weakDispatcher, renderData);
 
     vtk->actor = vtkActor::New();

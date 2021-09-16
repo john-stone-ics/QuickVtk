@@ -128,6 +128,8 @@ QQmlListProperty<Object> Viewer::input()
 
 Viewer::vtkUserData Viewer::initializeVTK(vtkRenderWindow* renderWindow)
 {
+    qDebug() << Q_FUNC_INFO << m_vtkInitialized;
+
     auto vtk = vtkNew<MyVtkData>(this, m_weakDispatcher);
 
     vtk->renderer = vtkRenderer::New();
