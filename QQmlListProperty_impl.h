@@ -51,8 +51,13 @@ struct QQmlListProperty_impl
         if (!objData)
             objData = object->initializeVTK(pThis->m_weakDispatcher, renderWindow, renderData);
 
-        if (!objData) {
+        if (!objData && object->isVolatile()) {
             qWarning() << "YIKES!!" << Q_FUNC_INFO << "object->initializeVTK() FAILED";
+            return;
+        }
+
+        if (objData && !object->isVolatile()) {
+            qWarning() << "YIKES!!" << Q_FUNC_INFO << "object->myVtkObject(objData) returned data but object is non-volatile";
             return;
         }
 
@@ -139,6 +144,11 @@ struct QQmlListProperty_impl
 
     static void append(QQmlListProperty<ObjT>* l, ObjT* object)
     {
+        if (object->m_quickVtkParent) {
+            qWarning() << "YIKES!! object is attached to another object";
+            return;
+        }
+
         auto pThis = qobject_cast<MyT*>(l->object);
 
         if (!pThis) {
@@ -159,6 +169,7 @@ struct QQmlListProperty_impl
         }
 
         list->append(object);
+        object->m_quickVtkParent = pThis;
 
         if (pThis->m_vtkInitialized)
         {
@@ -245,6 +256,16 @@ struct QQmlListProperty_impl
             qWarning() << "YIKES!!" << Q_FUNC_INFO << "reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
             return;
         }
+
+        for(auto object : *list)
+        {
+            if (object->m_quickVtkParent != pThis) {
+                qWarning() << "YIKES!! object is not attached to me";
+                continue;
+            }
+            object->m_quickVtkParent = nullptr;
+        }
+
 
         if (pThis->m_vtkInitialized)
         {

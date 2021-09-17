@@ -9,13 +9,14 @@ class vtkRenderer;
 
 #include <QtCore/QList>
 #include <QtCore/QPointF>
-#include <QtCore/QAtomicInt>
+#include <QtCore/QAtomicInteger>
+#include <QtCore/QAtomicPointer>
 
 #include <QQuickVtkItem.h>
 
 namespace quick { namespace vtk {
 
-class Viewer : public QQuickVtkItem, public Dispatcher
+class Viewer : public QQuickVtkItem, public Dispatcher, public SharedData
 {
     Q_OBJECT
     Q_CLASSINFO("DefaultProperty", "input");
@@ -50,11 +51,6 @@ private:
         Qt::MouseButton button = Qt::NoButton;
         QPointF localPos;
     } m_click;
-
-public:
-    WeakDispatcherPtr m_weakDispatcher;
-
-    QAtomicInt m_vtkInitialized = false;
 };
 
 }}

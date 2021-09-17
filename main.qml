@@ -50,8 +50,10 @@ ApplicationWindow {
     itemDelegate: DynamicSplitView.ItemDelegate
     {
       Rectangle {
+        id: bg
         anchors.fill: parent
         color: "lightBlue"
+        border { color: Qt.darker(bg.color); width: 35 }
       }
 
       MouseArea {
@@ -69,7 +71,7 @@ ApplicationWindow {
       }
 
       Vtk.Viewer {
-        anchors { fill: parent; margins: 35 }
+        anchors { fill: bg; margins: bg.border.width }
 
         Vtk.Actor {
 

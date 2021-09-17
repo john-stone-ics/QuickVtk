@@ -12,7 +12,7 @@ Mapper::Mapper(QObject* parent) : AbstractMapper3D(parent)
 
 vtkMapper* Mapper::myVtkObject(vtkUserData myUserData) const
 {
-    return vtkMapper::SafeDownCast(Algorithm::myVtkObject(myUserData));
+    return vtkMapper::SafeDownCast(AbstractMapper3D::myVtkObject(myUserData));
 }
 
 Mapper::ScalarMode Mapper::scalarMode() const

@@ -12,7 +12,7 @@ class PolyDataMapper : public Mapper
 public:
     PolyDataMapper(QObject* parent = nullptr);
 
-    vtkPolyDataMapper* makeAlgorithm() override;
+    vtkPolyDataMapper* makeAbstractMapper() override;
 
     vtkPolyDataMapper* myVtkObject(Object::vtkUserData) const override;
 };

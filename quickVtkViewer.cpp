@@ -18,6 +18,8 @@ namespace quick { namespace vtk {
 namespace {
 struct MyVtkData : UserData<Viewer>
 {
+    ~MyVtkData() { qDebug() << qobj; }
+
     vtkSmartPointer<vtkRenderer> renderer;
 
     QMap<QObject*, Object::vtkUserData> map;
@@ -27,8 +29,12 @@ struct MyVtkData : UserData<Viewer>
 };
 }
 
-Viewer::Viewer(QQuickItem* parent) : QQuickVtkItem(parent), m_weakDispatcher(this)
-{ }
+Viewer::Viewer(QQuickItem* parent) : QQuickVtkItem(parent)
+{
+    qDebug() << this;
+
+    m_weakDispatcher = this;
+}
 
 bool Viewer::map(QObject * object, vtkUserData objectData, vtkUserData myVtkData)
 {
@@ -38,12 +44,12 @@ bool Viewer::map(QObject * object, vtkUserData objectData, vtkUserData myVtkData
     auto vtk = MyVtkData::SafeDownCast(myVtkData);
 
     if (!vtk) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "myVtkData::SafeDownCast(myVtkData) FAILED";
+        qWarning() << "YIKES!! myVtkData::SafeDownCast(myVtkData) FAILED";
         return false;
     }
 
     if (vtk->map.contains(object)) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "object already mapped" << object;
+        qWarning() << "YIKES!! object already mapped" << object;
         return false;
     }
 
@@ -56,7 +62,7 @@ Object::vtkUserData Viewer::lookup(QObject * object, vtkUserData renderData, boo
     auto vtk = MyVtkData::SafeDownCast(renderData);
 
     if (!vtk) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "myVtkData::SafeDownCast(myVtkData) FAILED";
+        qWarning() << "YIKES!! myVtkData::SafeDownCast(myVtkData) FAILED";
         return {};
     }
 
@@ -65,7 +71,7 @@ Object::vtkUserData Viewer::lookup(QObject * object, vtkUserData renderData, boo
 
     if (!vtk->map.contains(object)) {
         if (!mightBeEmpty)
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "object not mapped" << object;
+            qWarning() << "YIKES!! object not mapped" << object;
         return {};
     }
 
@@ -80,12 +86,12 @@ bool Viewer::unmap(QObject* object, vtkUserData myVtkData)
     auto vtk = MyVtkData::SafeDownCast(myVtkData);
 
     if (!vtk) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "myVtkData::SafeDownCast(myVtkData) FAILED";
+        qWarning() << "YIKES!! myVtkData::SafeDownCast(myVtkData) FAILED";
         return false;
     }
 
     if (!vtk->map.contains(object)) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "object is not mapped" << object;
+        qWarning() << "YIKES!! object is not mapped" << object;
         return false;
     }
 
@@ -107,7 +113,7 @@ void attachToObject(vtkSmartPointer<vtkRenderer> renderer, vtkSmartPointer<vtkOb
 
     else {
         std::stringstream ss; objVtkObject->Print(ss);
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "Attempt to attach unknown typed object to quick::vtk::Viewer ignored" << ss.str().c_str();
+        qWarning() << "YIKES!! Attempt to attach unknown typed object to quick::vtk::Viewer ignored" << ss.str().c_str();
     }
 }
 
@@ -128,7 +134,7 @@ QQmlListProperty<Object> Viewer::input()
 
 Viewer::vtkUserData Viewer::initializeVTK(vtkRenderWindow* renderWindow)
 {
-    qDebug() << Q_FUNC_INFO << m_vtkInitialized;
+    qDebug() << this << m_vtkInitialized;
 
     auto vtk = vtkNew<MyVtkData>(this, m_weakDispatcher);
 
@@ -151,7 +157,7 @@ vtkRenderer* Viewer::myVtkObject(vtkUserData myUserData)
     auto vtk = MyVtkData::SafeDownCast(myUserData);
 
     if (!vtk) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "MyVtkData::SafeDownCast(myVtkData) FAILED";
+        qWarning() << "YIKES!! MyVtkData::SafeDownCast(myVtkData) FAILED";
         return {};
     }
 

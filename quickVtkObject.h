@@ -7,11 +7,10 @@
 class vtkRenderWindow;
 
 #include <QtCore/QObject>
-#include <QtCore/QAtomicInt>
 
 namespace quick { namespace vtk {
 
-class Object : public QObject
+class Object : public QObject, public SharedData
 {
     Q_OBJECT
 public:
@@ -27,14 +26,10 @@ public:
     using vtkUserData = vtkSmartPointer<vtkObject>;
     virtual vtkUserData initializeVTK(WeakDispatcherPtr, vtkRenderWindow*, vtkUserData) = 0;
     virtual vtkObject* myVtkObject(vtkUserData) const = 0;
+    virtual bool isVolatile() const = 0;
 
 private:
     Type m_type;
-
-public:
-    WeakDispatcherPtr m_weakDispatcher;
-
-    QAtomicInt m_vtkInitialized = 0;
 };
 
 } }

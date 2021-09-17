@@ -15,6 +15,8 @@ namespace quick { namespace vtk {
 namespace {
 struct MyVtkData : UserData<Actor>
 {
+    ~MyVtkData() { qDebug() << qobj; }
+
     vtkSmartPointer<vtkActor> actor;
 
     static MyVtkData* New() { return new MyVtkData; }
@@ -23,25 +25,27 @@ struct MyVtkData : UserData<Actor>
 }
 
 Actor::Actor(QObject* parent) : Prop3D(parent)
-{}
+{
+    qDebug() << this;
+}
 
 namespace {
 void attachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, Actor::vtkUserData renderData)
 {
     if (!pThis) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "pThis is nullptr";
+        qWarning() << "YIKES!! pThis is nullptr";
         return;
     }
 
     if (!mapper) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "mapper is nullptr";
+        qWarning() << "YIKES!! mapper is nullptr";
         return;
     }
 
     auto dispatcher = pThis->m_weakDispatcher.lock();
 
     if (!dispatcher) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "m_weakDispatcher.lock() FAILED";
+        qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
         return;
     }
 
@@ -74,19 +78,19 @@ void attachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
 void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, Actor::vtkUserData renderData)
 {
     if (!pThis) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "pThis is nullptr";
+        qWarning() << "YIKES!! pThis is nullptr";
         return;
     }
 
     if (!mapper) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "mapper is nullptr";
+        qWarning() << "YIKES!! mapper is nullptr";
         return;
     }
 
     auto dispatcher = pThis->m_weakDispatcher.lock();
 
     if (!dispatcher) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "m_weakDispatcher.lock() FAILED";
+        qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
         return;
     }
 
@@ -114,7 +118,7 @@ void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
         return;
 
     if (vtkActor->GetMapper() != vtkMapper)
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "vtkActor->GetMapper():" << vtkActor->GetMapper() << "!= vtkMapper:" << vtkMapper;
+        qWarning() << "YIKES!! vtkActor->GetMapper():" << vtkActor->GetMapper() << "!= vtkMapper:" << vtkMapper;
 
     vtkActor->SetMapper(nullptr);
 }
@@ -122,7 +126,7 @@ void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
 
 Actor::vtkUserData Actor::initializeVTK(WeakDispatcherPtr weakDispatcher, vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
-    qDebug() << Q_FUNC_INFO << m_vtkInitialized;
+    qDebug() << this << m_vtkInitialized;
 
     auto vtk = vtkNew<MyVtkData>(this, weakDispatcher, renderData);
 
@@ -143,11 +147,16 @@ vtkActor* Actor::myVtkObject(vtkUserData myUserData) const
     auto vtk = MyVtkData::SafeDownCast(myUserData);
 
     if (!vtk) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "MyVtkData::SafeDownCast(myUserData) FAILED";
+        qWarning() << "YIKES!! MyVtkData::SafeDownCast(myUserData) FAILED";
         return {};
     }
 
     return vtk->actor;
+}
+
+bool Actor::isVolatile() const
+{
+    return true;
 }
 
 Mapper* Actor::mapper() const { return m_mapper; }
@@ -158,10 +167,17 @@ void Actor::setMapper(Mapper* v)
 
     if (m_vtkInitialized && m_mapper)
     {
+        if (v->m_quickVtkParent != this) {
+            qWarning() << "YIKES!! mapper is not attached to me";
+            return;
+        }
+
+        v->m_quickVtkParent = nullptr;
+
         auto dispatcher = m_weakDispatcher.lock();
 
         if (!dispatcher) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "m_weakDispatcher.lock() FAILED";
+            qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
             return;
         }
 
@@ -176,10 +192,17 @@ void Actor::setMapper(Mapper* v)
 
     if (m_vtkInitialized && m_mapper)
     {
+        if (v->m_quickVtkParent) {
+            qWarning() << "YIKES!! mapper is attached to another object";
+            return;
+        }
+
+        v->m_quickVtkParent = this;
+
         auto dispatcher = m_weakDispatcher.lock();
 
         if (!dispatcher) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "m_weakDispatcher.lock() FAILED";
+            qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
             return;
         }
 

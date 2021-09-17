@@ -3,7 +3,9 @@
 namespace quick { namespace vtk {
 
 ConeSource::ConeSource(QObject* parent) : PolyDataAlgorithm(parent)
-{}
+{
+    qDebug() << this;
+}
 
 vtkConeSource* ConeSource::makeAlgorithm() {
     return vtkConeSource::New();

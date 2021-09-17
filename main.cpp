@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
+    qSetMessagePattern("\033[35m%{threadid}\033[0m  \033[1m%{file}(%{line}): \033[34m%{function}\033[0m -- %{message}");
     QGuiApplication app(argc, argv);
 
     qmlRegisterUncreatableType<quick::vtk::AbstractMapper3D >("Vtk", 1, 0, "AbstractMapper3D",  "!!");
@@ -50,5 +51,7 @@ int main(int argc, char *argv[])
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
+
+    qDebug() << "app.exec()";
     return app.exec();
 }

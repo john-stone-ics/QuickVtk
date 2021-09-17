@@ -30,6 +30,7 @@ public:
 
     vtkUserData initializeVTK(WeakDispatcherPtr, vtkRenderWindow*, vtkUserData) override;
     vtkActor* myVtkObject(vtkUserData) const override;
+    bool isVolatile() const override;
 };
 
 } }

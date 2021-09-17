@@ -37,6 +37,12 @@ set(QT_DIR ${Qt5_DIR})
 
 find_package(QT NAMES Qt5 COMPONENTS Core Quick REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick REQUIRED)
+#find_package(Qt5QuickCompiler QUIET)
+#if(Qt5QuickCompiler_FOUND AND NOT CMAKE_BUILD_TYPE MATCHES Debug AND NOT CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+#  QTQUICK_COMPILER_ADD_RESOURCES(RESOURCES qml.qrc)
+#else()
+#  set(RESOURCES qml.qrc)
+#endif()
 
 get_filename_component(QT_TOP "../../.." 
   REALPATH BASE_DIR "${Qt5_DIR}" CACHE

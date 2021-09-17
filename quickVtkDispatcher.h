@@ -7,7 +7,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/QThread>
-#include <QtCore/QAtomicInt>
+#include <QtCore/QAtomicInteger>
+#include <QtCore/QAtomicPointer>
 #include <QtCore/QRecursiveMutex>
 #include <QtCore/QExplicitlySharedDataPointer>
 
@@ -72,6 +73,13 @@ struct WeakDispatcherPtr
     QExplicitlySharedDataPointer<Data> d;
 };
 
+
+struct SharedData
+{
+    WeakDispatcherPtr       m_weakDispatcher{nullptr};
+    QAtomicInteger<bool>    m_vtkInitialized = false;
+    QPointer<QObject>       m_quickVtkParent;
+};
 
 template<typename T>
 struct UserData : vtkObject {

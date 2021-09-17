@@ -22,12 +22,15 @@ public:
 
     vtkUserData initializeVTK(WeakDispatcherPtr, vtkRenderWindow*, vtkUserData) override;
     vtkAlgorithm* myVtkObject(vtkUserData) const override;
+    bool isVolatile() const override;
+
+    vtkSmartPointer<vtkAlgorithm> m_vtkAlgorithm;
 
 protected:
     Algorithm(QObject* parent);
 
 private:
-    virtual vtkAlgorithm* makeAlgorithm() = 0;
+    virtual vtkAlgorithm* makeAlgorithm() = 0;    
 };
 
 } }

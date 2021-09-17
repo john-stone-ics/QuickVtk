@@ -46,7 +46,7 @@ WeakDispatcherPtr::Data::Data(quick::vtk::Dispatcher* p)
 
     _p = p;
 
-    auto qobj = dynamic_cast<QObject*>(p); if (!qobj)
+    auto qobj = dynamic_cast<QObject*>(p); if (!qobj && p)
         qFatal("YIKES!! %s  --  dynamic_cast<QObject*>(%p) FAILED", Q_FUNC_INFO, p);
 
     _c = QObject::connect(qobj, &QObject::destroyed, [this] {

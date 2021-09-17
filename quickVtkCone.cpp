@@ -32,7 +32,7 @@ void Cone::setAngle(qreal v)
         auto dispatcher = m_weakDispatcher.lock();
 
         if (!dispatcher) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "m_weakDispatcher.lock() FAILED";
+            qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
             return;
         }
 
@@ -42,7 +42,7 @@ void Cone::setAngle(qreal v)
                 auto dispatcher = pThis->m_weakDispatcher.lock();
 
                 if (!dispatcher) {
-                    qWarning() << "YIKES!!" << Q_FUNC_INFO << "m_weakDispatcher.lock() FAILED";
+                    qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
                     return;
                 }
 
@@ -66,7 +66,7 @@ void Cone::setAngle(qreal v)
 
 Cone::vtkUserData Cone::initializeVTK(WeakDispatcherPtr weakDispatcher, vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
-    qDebug() << Q_FUNC_INFO << m_vtkInitialized;
+    qDebug() << m_vtkInitialized;
 
     auto vtk = vtkNew<MyVtkData>(this, weakDispatcher, renderData);
 
@@ -82,7 +82,7 @@ vtkCone* Cone::myVtkObject(vtkUserData myUserData) const
     auto vtk = MyVtkData::SafeDownCast(myUserData);
 
     if (!vtk) {
-        qWarning() << "YIKES!!" << Q_FUNC_INFO << "MyVtkData::SafeDownCast(myUserData) FAILED";
+        qWarning() << "YIKES!! MyVtkData::SafeDownCast(myUserData) FAILED";
         return {};
     }
 
