@@ -42,17 +42,17 @@ void attachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
         return;
     }
 
-    auto dispatcher = pThis->m_weakDispatcher.lock();
+    auto dispatcher = pThis->dispatcher();
 
     if (!dispatcher) {
-        qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
+        qWarning() << "YIKES!! pThis->dispatcher() FAILED";
         return;
     }
 
     auto mapperData = dispatcher->lookup(mapper, renderData, true);
 
     if (!mapperData)
-        mapperData = mapper->initializeVTK(pThis->m_weakDispatcher, renderWindow, renderData);
+        mapperData = mapper->initializeVTK(renderWindow, renderData);
 
     if (!mapperData)
         return;
@@ -87,17 +87,17 @@ void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
         return;
     }
 
-    auto dispatcher = pThis->m_weakDispatcher.lock();
+    auto dispatcher = pThis->dispatcher();
 
     if (!dispatcher) {
-        qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
+        qWarning() << "YIKES!! pThis->dispatcher() FAILED";
         return;
     }
 
     auto mapperData = dispatcher->lookup(mapper, renderData, true);
 
     if (!mapperData)
-        mapperData = mapper->initializeVTK(pThis->m_weakDispatcher, renderWindow, renderData);
+        mapperData = mapper->initializeVTK(renderWindow, renderData);
 
     if (!mapperData)
         return;
@@ -124,11 +124,11 @@ void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
 }
 }
 
-Actor::vtkUserData Actor::initializeVTK(WeakDispatcherPtr weakDispatcher, vtkRenderWindow* renderWindow, vtkUserData renderData)
+Actor::vtkUserData Actor::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
     qDebug() << this << m_vtkInitialized;
 
-    auto vtk = vtkNew<MyVtkData>(this, weakDispatcher, renderData);
+    auto vtk = vtkNew<MyVtkData>(this, renderData);
 
     vtk->actor = vtkActor::New();
 
@@ -165,52 +165,38 @@ void Actor::setMapper(Mapper* v)
     if (m_mapper == v)
         return;
 
-    if (m_vtkInitialized && m_mapper)
+    if (m_mapper)
     {
-        if (v->m_quickVtkParent != this) {
-            qWarning() << "YIKES!! mapper is not attached to me";
-            return;
-        }
+        m_mapper->delVtkParent(this);
 
-        v->m_quickVtkParent = nullptr;
-
-        auto dispatcher = m_weakDispatcher.lock();
-
-        if (!dispatcher) {
-            qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
-            return;
-        }
-
-        dispatcher->dispatch_async([pThis=QPointer<Actor>(this), mapper=QPointer<Mapper>(m_mapper)]
+        if (m_vtkInitialized)
+        {
+            dispatcher()->dispatch_async([
+                pThis = QPointer<Actor>(this),
+                mapper = QPointer<Mapper>(m_mapper)]
             (vtkRenderWindow* renderWindow, vtkUserData renderData) mutable
             {
                 detachMapper(pThis, mapper, renderWindow, renderData);
             });
+        }
     }
 
     emit mapperChanged(m_mapper = v);
 
-    if (m_vtkInitialized && m_mapper)
+    if (m_mapper)
     {
-        if (v->m_quickVtkParent) {
-            qWarning() << "YIKES!! mapper is attached to another object";
-            return;
-        }
+        m_mapper->addVtkParent(this);
 
-        v->m_quickVtkParent = this;
-
-        auto dispatcher = m_weakDispatcher.lock();
-
-        if (!dispatcher) {
-            qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
-            return;
-        }
-
-        dispatcher->dispatch_async([pThis=QPointer<Actor>(this), mapper=QPointer<Mapper>(v)]
+        if (m_vtkInitialized)
+        {
+            dispatcher()->dispatch_async([
+                pThis = QPointer<Actor>(this),
+                mapper = QPointer<Mapper>(v)]
             (vtkRenderWindow* renderWindow, vtkUserData renderData) mutable
             {
                 attachMapper(pThis, mapper, renderWindow, renderData);
             });
+        }
     }
 }
 

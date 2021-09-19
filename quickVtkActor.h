@@ -28,7 +28,7 @@ public:
 public:
     Actor(QObject* parent=nullptr);
 
-    vtkUserData initializeVTK(WeakDispatcherPtr, vtkRenderWindow*, vtkUserData) override;
+    vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkActor* myVtkObject(vtkUserData) const override;
     bool isVolatile() const override;
 };

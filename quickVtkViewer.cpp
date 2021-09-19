@@ -32,8 +32,11 @@ struct MyVtkData : UserData<Viewer>
 Viewer::Viewer(QQuickItem* parent) : QQuickVtkItem(parent)
 {
     qDebug() << this;
+}
 
-    m_weakDispatcher = this;
+Viewer::~Viewer()
+{
+    aboutToBeDeleted();
 }
 
 bool Viewer::map(QObject * object, vtkUserData objectData, vtkUserData myVtkData)
@@ -136,7 +139,7 @@ Viewer::vtkUserData Viewer::initializeVTK(vtkRenderWindow* renderWindow)
 {
     qDebug() << this << m_vtkInitialized;
 
-    auto vtk = vtkNew<MyVtkData>(this, m_weakDispatcher);
+    auto vtk = vtkNew<MyVtkData>(this);
 
     vtk->renderer = vtkRenderer::New();
 
@@ -200,16 +203,16 @@ bool Viewer::event(QEvent* ev)
     {
     case QEvent::MouseButtonPress: {
         auto e = static_cast<QMouseEvent*>(ev);
-        if (Qt::MouseButton::LeftButton != e->button()) {
-            m_click.button = e->button();
-            m_click.localPos = e->localPos();
-        }
+        m_click.button = e->button();
+        m_click.localPos = e->localPos();
         break;
     }
     case QEvent::MouseButtonRelease: {
         auto e = static_cast<QMouseEvent*>(ev);
-        if ((m_click.button == e->button()) && (m_click.localPos - e->localPos()).manhattanLength() < 3)
-            emit clicked(e);
+        if ((m_click.button == e->button()) && (m_click.localPos - e->localPos()).manhattanLength() < 3) {
+            m_quickMouseEvent.reset(e->x(), e->y(), e->button(), e->buttons(), e->modifiers(), true, false, e->flags());
+            emit clicked(&m_quickMouseEvent);
+        }
         break;
     }
     default: 

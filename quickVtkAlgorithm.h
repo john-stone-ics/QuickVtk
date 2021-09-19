@@ -20,7 +20,7 @@ public:
     Q_SIGNAL void inputChanged();
     QList<Algorithm*> m_input;
 
-    vtkUserData initializeVTK(WeakDispatcherPtr, vtkRenderWindow*, vtkUserData) override;
+    vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkAlgorithm* myVtkObject(vtkUserData) const override;
     bool isVolatile() const override;
 

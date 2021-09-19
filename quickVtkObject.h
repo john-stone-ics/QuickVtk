@@ -24,7 +24,7 @@ public:
     Type type() const;
 
     using vtkUserData = vtkSmartPointer<vtkObject>;
-    virtual vtkUserData initializeVTK(WeakDispatcherPtr, vtkRenderWindow*, vtkUserData) = 0;
+    virtual vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) = 0;
     virtual vtkObject* myVtkObject(vtkUserData) const = 0;
     virtual bool isVolatile() const = 0;
 

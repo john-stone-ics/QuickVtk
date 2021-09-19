@@ -18,10 +18,10 @@ struct QQmlListProperty_impl
 {   
     static void attachObject(MyT* pThis, quick::vtk::Object* object, int index, vtkRenderWindow* renderWindow, typename ObjT::vtkUserData renderData)
     {
-        auto dispatcher = pThis->m_weakDispatcher.lock();
+        auto dispatcher = pThis->dispatcher();
 
         if (!dispatcher) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << pThis << "pThis->m_weakDispatcher.lock() FAILED";
+            qWarning() << "YIKES!!" << Q_FUNC_INFO << pThis << "pThis->dispatcher()) FAILED";
             return;
         }
 
@@ -49,7 +49,7 @@ struct QQmlListProperty_impl
         auto objData = dispatcher->lookup(object, renderData, true);
 
         if (!objData)
-            objData = object->initializeVTK(pThis->m_weakDispatcher, renderWindow, renderData);
+            objData = object->initializeVTK(renderWindow, renderData);
 
         if (!objData && object->isVolatile()) {
             qWarning() << "YIKES!!" << Q_FUNC_INFO << "object->initializeVTK() FAILED";
@@ -80,10 +80,10 @@ struct QQmlListProperty_impl
 
     static void detachObjects(MyT* pThis, typename ObjT::vtkUserData renderData, QList<ObjT*> list)
     {
-        auto dispatcher = pThis->m_weakDispatcher.lock();
+        auto dispatcher = pThis->dispatcher();
 
         if (!dispatcher) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << pThis << "pThis->m_weakDispatcher.lock() FAILED";
+            qWarning() << "YIKES!!" << Q_FUNC_INFO << pThis << "pThis->m_dispatcher() FAILED";
             return;
         }
 
@@ -112,9 +112,9 @@ struct QQmlListProperty_impl
         {
             auto& object = list.at(index);
 
-            auto objUserData = dispatcher->lookup(object, renderData);
+            auto objUserData = dispatcher->lookup(object, renderData, !object->isVolatile());
 
-            if (!objUserData) {
+            if (!objUserData && object->isVolatile()) {
                 qWarning() << "YIKES!!" << Q_FUNC_INFO << "dispatcher->lookup(object, renderData) FAILED";
                 continue;
             }
@@ -135,7 +135,7 @@ struct QQmlListProperty_impl
 
             Rf(myDownCastObject, objDownCastObject, index);
 
-            if (!dispatcher->unmap(object, ObjVtk::SafeDownCast(objVtkObject))) {
+            if (object->isVolatile() && !dispatcher->unmap(object, ObjVtk::SafeDownCast(objVtkObject))) {
                 qWarning().nospace() << "YIKES!! " << Q_FUNC_INFO << " dispatcher->unmap(object, renderData) FAILED";
                 continue;
             }
@@ -144,11 +144,6 @@ struct QQmlListProperty_impl
 
     static void append(QQmlListProperty<ObjT>* l, ObjT* object)
     {
-        if (object->m_quickVtkParent) {
-            qWarning() << "YIKES!! object is attached to another object";
-            return;
-        }
-
         auto pThis = qobject_cast<MyT*>(l->object);
 
         if (!pThis) {
@@ -169,32 +164,29 @@ struct QQmlListProperty_impl
         }
 
         list->append(object);
-        object->m_quickVtkParent = pThis;
+        object->addVtkParent(pThis);
+        emit pThis->inputChanged();
 
         if (pThis->m_vtkInitialized)
         {
-            auto dispatcher = pThis->m_weakDispatcher.lock();
+            pThis->dispatcher()->dispatch_async([
+                pThis  = QPointer<MyT>(pThis),
+                object = QPointer<ObjT>(object),
+                index  = list->count()-1]
+            (vtkRenderWindow* renderWindow, typename ObjT::vtkUserData renderData) mutable
+            {
+                if (!pThis) {
+                    qWarning() << "YIKES!!" << Q_FUNC_INFO << "I was deleted";
+                    return;
+                }
 
-            if (!dispatcher) {
-                qWarning() << "YIKES!!" << Q_FUNC_INFO << pThis << "pThis->m_weakDispatcher.lock() FAILED";
-                return;
-            }
+                if (!object) {
+                    qWarning() << "YIKES!!" << Q_FUNC_INFO << "object was deleted";
+                    return;
+                }
 
-            dispatcher->dispatch_async([pThis = QPointer<MyT>(pThis), object = QPointer<ObjT>(object), index = list->count()]
-                (vtkRenderWindow* renderWindow, typename ObjT::vtkUserData renderData) mutable
-                {
-                    if (!pThis) {
-                        qWarning() << "YIKES!!" << Q_FUNC_INFO << "I was deleted";
-                        return;
-                    }
-
-                    if (!object) {
-                        qWarning() << "YIKES!!" << Q_FUNC_INFO << "object was deleted";
-                        return;
-                    }
-
-                    attachObject(pThis, object, index, renderWindow, renderData);
-                });
+                attachObject(pThis, object, index, renderWindow, renderData);
+            });
         }
     }
 
@@ -257,37 +249,25 @@ struct QQmlListProperty_impl
             return;
         }
 
-        for(auto object : *list)
-        {
-            if (object->m_quickVtkParent != pThis) {
-                qWarning() << "YIKES!! object is not attached to me";
-                continue;
-            }
-            object->m_quickVtkParent = nullptr;
-        }
-
-
         if (pThis->m_vtkInitialized)
         {
-            auto dispatcher = pThis->m_weakDispatcher.lock();
+            pThis->dispatcher()->dispatch_async([
+                pThis = QPointer<MyT>(pThis),
+                list = *list] //<-- Note: we make a copy of the list
+            (vtkRenderWindow* renderWindow, typename ObjT::vtkUserData renderData) mutable
+            {
+                if (!pThis) {
+                    qWarning() << "YIKES!!" << Q_FUNC_INFO << "I was deleted";
+                    return;
+                }
 
-            if (!dispatcher) {
-                qWarning() << "YIKES!!" << Q_FUNC_INFO << pThis << "pThis->m_weakDispatcher.lock() FAILED";
-                return;
-            }
-
-            dispatcher->dispatch_async([pThis = QPointer<MyT>(pThis), list = *list] //<-- Note: we make a copy of the list
-                (vtkRenderWindow* renderWindow, typename ObjT::vtkUserData renderData) mutable
-                {
-                    if (!pThis) {
-                        qWarning() << "YIKES!!" << Q_FUNC_INFO << "I was deleted";
-                        return;
-                    }
-
-                    detachObjects(pThis, renderData, list);
-                });
+                detachObjects(pThis, renderData, list);
+            });
         }
 
+        for(auto object : *list)
+            object->delVtkParent(pThis);
         list->clear();
+        emit pThis->inputChanged();
     }
 };

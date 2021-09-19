@@ -12,6 +12,8 @@ class vtkRenderer;
 #include <QtCore/QAtomicInteger>
 #include <QtCore/QAtomicPointer>
 
+#include <private/qquickevents_p_p.h> // for QQuickMouseEvent
+
 #include <QQuickVtkItem.h>
 
 namespace quick { namespace vtk {
@@ -22,6 +24,7 @@ class Viewer : public QQuickVtkItem, public Dispatcher, public SharedData
     Q_CLASSINFO("DefaultProperty", "input");
 public:
     Viewer(QQuickItem* parent=nullptr);
+    ~Viewer() override;
 
     // QQuickVtkItem interface
     using vtkUserData = vtkSmartPointer<vtkObject>;
@@ -41,7 +44,7 @@ public:
     QList<Object*> m_input;
 
 signals:
-    void clicked(QMouseEvent*);
+    void clicked(QQuickMouseEvent * mouse);
 
 private:
     bool event(QEvent*) override;
@@ -51,6 +54,8 @@ private:
         Qt::MouseButton button = Qt::NoButton;
         QPointF localPos;
     } m_click;
+
+    QQuickMouseEvent m_quickMouseEvent;
 };
 
 }}

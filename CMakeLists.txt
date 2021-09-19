@@ -37,6 +37,8 @@ set(QT_DIR ${Qt5_DIR})
 
 find_package(QT NAMES Qt5 COMPONENTS Core Quick REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick REQUIRED)
+find_package(Qt5Quick ${QT_MIN_VERSION} CONFIG REQUIRED Private)
+##JSS include_directories(${Qt${QT_VERSION_MAJOR}Quick_PRIVATE_INCLUDE_DIRS})
 #find_package(Qt5QuickCompiler QUIET)
 #if(Qt5QuickCompiler_FOUND AND NOT CMAKE_BUILD_TYPE MATCHES Debug AND NOT CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
 #  QTQUICK_COMPILER_ADD_RESOURCES(RESOURCES qml.qrc)
@@ -53,6 +55,7 @@ message (STATUS "QT_TOP: ${QT_TOP}")
 message (STATUS "Qt5_DIR: ${Qt5_DIR}")
 message (STATUS "VTK_VERSION: ${VTK_VERSION}")
 message (STATUS "VTK_DIR: ${VTK_DIR}")
+message (STATUS "Qt5Quick_PRIVATE_INCLUDE_DIRS: ${Qt5Quick_PRIVATE_INCLUDE_DIRS}")
 
 add_executable(${MYNAME}
   QQmlListProperty_impl.h
@@ -91,8 +94,12 @@ add_executable(${MYNAME}
   quickVtkCone.cpp
   quickVtkConeSource.h
   quickVtkConeSource.cpp
+  quickVtkCylinderSource.h
+  quickVtkCylinderSource.cpp
   quickVtkImplicitFunction.h
   quickVtkImplicitFunction.cpp
+  quickMathVector3.h
+  quickMathVector3.cpp
   qt-qml-models/QQmlVariantListModel.cpp
   qt-qml-models/QQmlVariantListModel.h
   qt-qml-models/QQmlObjectListModel.cpp
@@ -111,11 +118,13 @@ vtk_module_autoinit(
 TARGETS ${MYNAME}
 MODULES ${VTK_LIBRARIES}
 )
+
+target_include_directories(${MYNAME} PRIVATE Qt5Quick_PRIVATE_INCLUDE_DIRS)
 target_compile_definitions(${MYNAME} PRIVATE 
   $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
 )
 target_link_libraries(${MYNAME} PRIVATE 
-  Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick
+  Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::QuickPrivate
 )
 
 if(WIN32)

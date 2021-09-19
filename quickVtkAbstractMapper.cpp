@@ -42,11 +42,11 @@ QQmlListProperty<Algorithm> AbstractMapper::input()
     return QQmlListProperty<Algorithm>(this, &m_input, inputImpl.append, inputImpl.count, inputImpl.at, inputImpl.clear);
 }
 
-AbstractMapper::vtkUserData AbstractMapper::initializeVTK(WeakDispatcherPtr weakDispatcher, vtkRenderWindow* renderWindow, vtkUserData renderData)
+AbstractMapper::vtkUserData AbstractMapper::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
     qDebug() << this << m_vtkInitialized;
 
-    auto vtk = vtkNew<MyVtkData>(this, weakDispatcher, renderData);
+    auto vtk = vtkNew<MyVtkData>(this, renderData);
 
     vtk->abstractMapper = makeAbstractMapper();
 

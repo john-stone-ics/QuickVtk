@@ -29,46 +29,41 @@ void Cone::setAngle(qreal v)
         if (!m_vtkInitialized)
             return;
 
-        auto dispatcher = m_weakDispatcher.lock();
+        dispatcher()->dispatch_async([
+             pThis = QPointer<Cone>(this),
+             angle = v]
+        (vtkRenderWindow* renderWindow, vtkUserData renderData) mutable
+        {
+            auto dispatcher = pThis->dispatcher();
 
-        if (!dispatcher) {
-            qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
-            return;
-        }
+            if (!dispatcher) {
+                qWarning() << "YIKES!! pThis->dispatcher() FAILED";
+                return;
+            }
 
-        dispatcher->dispatch_async([pThis=QPointer<Cone>(this), angle=v]
-            (vtkRenderWindow* renderWindow, vtkUserData renderData) mutable
-            {
-                auto dispatcher = pThis->m_weakDispatcher.lock();
+            auto myUserData = dispatcher->lookup(pThis, renderData);
 
-                if (!dispatcher) {
-                    qWarning() << "YIKES!! m_weakDispatcher.lock() FAILED";
-                    return;
-                }
+            if (!myUserData) {
+                return;
+            }
 
-                auto myUserData = dispatcher->lookup(pThis, renderData);
+            auto vtkCone = pThis->myVtkObject(myUserData);
 
-                if (!myUserData) {
-                    return;
-                }
+            if (!vtkCone) {
+                return;
+            }
 
-                auto vtkCone = pThis->myVtkObject(myUserData);
-
-                if (!vtkCone) {
-                    return;
-                }
-
-                vtkCone->SetAngle(angle);
-            });
+            vtkCone->SetAngle(angle);
+        });
     }
 }
 
 
-Cone::vtkUserData Cone::initializeVTK(WeakDispatcherPtr weakDispatcher, vtkRenderWindow* renderWindow, vtkUserData renderData)
+Cone::vtkUserData Cone::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
     qDebug() << m_vtkInitialized;
 
-    auto vtk = vtkNew<MyVtkData>(this, weakDispatcher, renderData);
+    auto vtk = vtkNew<MyVtkData>(this, renderData);
 
     vtk->cone = vtkCone::New();
 
@@ -87,6 +82,11 @@ vtkCone* Cone::myVtkObject(vtkUserData myUserData) const
     }
 
     return vtk->cone;
+}
+
+bool Cone::isVolatile() const
+{
+    return true;
 }
 
 } }

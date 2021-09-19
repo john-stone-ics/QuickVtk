@@ -19,8 +19,9 @@ public:
     qreal m_angle;
 
 public:
-    vtkUserData initializeVTK(WeakDispatcherPtr, vtkRenderWindow*, vtkUserData) override;
+    vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkCone* myVtkObject(vtkUserData) const override;
+    bool isVolatile() const;
 };
 
 } }

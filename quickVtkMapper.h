@@ -21,13 +21,13 @@ public:
     Q_ENUM(ScalarMode);
     Q_PROPERTY(quick::vtk::Mapper::ScalarMode scalarMode READ scalarMode WRITE setScalarMode NOTIFY scalarModeChanged)
     ScalarMode scalarMode() const;
-    void setScalarMode(enum ScalarMode);
+    void setScalarMode(enum ScalarMode, bool force=false);
     Q_SIGNAL void scalarModeChanged(enum ScalarMode);
     enum ScalarMode m_scalarMode = ScalarMode::ScalarModeDefault;
 
     Q_PROPERTY(bool scalarVisibility READ scalarVisibility WRITE setScalarVisibility NOTIFY scalarVisibilityChanged)
     bool scalarVisibility() const;
-    void setScalarVisibility(bool);
+    void setScalarVisibility(bool, bool force=false);
     Q_SIGNAL void scalarVisibilityChanged(bool);
     bool m_scalarVisibility = false;
 
@@ -35,6 +35,7 @@ protected:
     Mapper(QObject* parent);
 
 public:
+    vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkMapper* myVtkObject(Object::vtkUserData) const override;
 };
 

@@ -6,12 +6,15 @@
 #include <QtCore/QDebug>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
+#if 0
 #include <QtCore/QThread>
 #include <QtCore/QAtomicInteger>
 #include <QtCore/QAtomicPointer>
 #include <QtCore/QRecursiveMutex>
 #include <QtCore/QExplicitlySharedDataPointer>
+#endif
 
+#include <list>
 #include <functional>
 
 class vtkRenderWindow;
@@ -36,9 +39,13 @@ public:
     virtual bool map(QObject*, vtkUserData, vtkUserData) = 0;
     virtual bool unmap(QObject*, vtkUserData) = 0;
     virtual vtkUserData lookup(QObject*, vtkUserData, bool mightBeEmpty=false) = 0;
+
+    void aboutToBeDeleted();
+    struct Observer { virtual void aboutToBeDeleted() = 0; };
+    QSet<Observer*> m_aboutToBeDeleted;
 };
 
-
+#if 0
 struct StrongDispatcherPtr
 {
     StrongDispatcherPtr(WeakDispatcherPtr&);
@@ -58,27 +65,35 @@ struct WeakDispatcherPtr
 {
     WeakDispatcherPtr(quick::vtk::Dispatcher *);
 
-    StrongDispatcherPtr lock();
-    operator bool();
+    StrongDispatcherPtr lock(bool canFail=false);
+    operator bool() const;
 
-    struct Data : QSharedData {
+    struct Data : QSharedData, Dispatcher::Observer {
         Data(quick::vtk::Dispatcher*);
         ~Data();
         QRecursiveMutex         _m;
         int                     _n = 0;
         Qt::HANDLE              _t = nullptr;
         quick::vtk::Dispatcher* _p = nullptr;
-        QMetaObject::Connection _c;
+        void aboutToBeDeleted() override;
     };
     QExplicitlySharedDataPointer<Data> d;
 };
-
+#endif
 
 struct SharedData
 {
-    WeakDispatcherPtr       m_weakDispatcher{nullptr};
-    QAtomicInteger<bool>    m_vtkInitialized = false;
-    QPointer<QObject>       m_quickVtkParent;
+    virtual ~SharedData() = default;
+
+    void addVtkParent(QObject*);
+    void delVtkParent(QObject*);
+
+    Dispatcher* dispatcher();
+
+    QAtomicInteger<bool> m_vtkInitialized = false;
+
+private:
+    std::list<QPointer<QObject>> m_quickVtkParents;
 };
 
 template<typename T>
@@ -91,20 +106,13 @@ struct UserData : vtkObject {
 };
 
 template<typename T, typename Q>
-::vtkNew<T> vtkNew(Q* qobj, WeakDispatcherPtr weakDispatcher, Dispatcher::vtkUserData renderData = {})
+::vtkNew<T> vtkNew(Q* qobj, Dispatcher::vtkUserData renderData = {})
 {
-    qobj->m_weakDispatcher = weakDispatcher;
-
     ::vtkNew<T> tmp;
 
     tmp->qobj = qobj;
 
-    auto dispatcher = weakDispatcher.lock();
-
-    if (!dispatcher)
-        qFatal("YIKES!! %s m_weakDispatcher.lock() FAILED", Q_FUNC_INFO);
-
-    if (!dispatcher->map(qobj, tmp, renderData))
+    if (!qobj->dispatcher()->map(qobj, tmp, renderData))
         qFatal("YIKES!! %s dispatcher->map(obj, myData, renderData) FAILED", Q_FUNC_INFO);
 
     return tmp;
