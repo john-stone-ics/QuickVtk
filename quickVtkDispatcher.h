@@ -5,6 +5,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QObject>
+#include <QtCore/QVector>
 #include <QtCore/QPointer>
 #if 0
 #include <QtCore/QThread>
@@ -35,7 +36,7 @@ public:
     // Note:  This class's methods will be called from both the gui-thread and render-thread (with gui-thread blocked)
 
     using vtkUserData = vtkSmartPointer<vtkObject>;
-    virtual void dispatch_async(std::function<void(vtkRenderWindow*, vtkUserData)>&&, SharedData*) = 0;
+    virtual void dispatch_async(std::function<void(vtkRenderWindow*, vtkUserData)>, SharedData*) = 0;
 
     virtual bool map(QObject*, vtkUserData, vtkUserData) = 0;
     virtual bool unmap(QObject*, vtkUserData) = 0;
@@ -92,7 +93,7 @@ public:
     void delVtkParent(QObject*);
 
     Dispatcher* dispatcher();
-    QList<QPointer<QObject>> dispatchers();
+    QVector<QPointer<QObject>> dispatchers();
 
     QAtomicInteger<bool> m_vtkInitialized = false;
 
@@ -100,10 +101,10 @@ private:
     std::list<QPointer<QObject>> m_quickVtkParents;
     bool findDispatchers(std::function<bool(Dispatcher*)>);
     void refreshCaches();
-    Dispatcher*              m_dispatcher = nullptr;
-    QList<QPointer<QObject>> m_dispatchers;
-    bool                     m_dirtyCache = true;
-    static QSet<SharedData*> s_instances;
+    Dispatcher*                m_dispatcher = nullptr;
+    QVector<QPointer<QObject>> m_dispatchers;
+    bool                       m_dirtyCache = true;
+    static QSet<SharedData*>   s_instances;
 };
 
 template<typename T>

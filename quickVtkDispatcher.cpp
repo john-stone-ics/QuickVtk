@@ -184,7 +184,7 @@ Dispatcher* SharedData::dispatcher()
     return m_dispatcher;
 }
 
-QList<QPointer<QObject>> SharedData::dispatchers()
+QVector<QPointer<QObject>> SharedData::dispatchers()
 {
     if (m_dirtyCache)
         refreshCaches();

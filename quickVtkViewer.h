@@ -31,7 +31,7 @@ public:
     vtkUserData initializeVTK(vtkRenderWindow*) override;
 
     // Dispatcher interface
-    void dispatch_async(std::function<void(vtkRenderWindow*, vtkUserData)>&&, SharedData*) override;
+    void dispatch_async(std::function<void(vtkRenderWindow*, vtkUserData)>, SharedData*) override;
     bool map(QObject*, vtkUserData, vtkUserData) override;
     bool unmap(QObject*, vtkUserData) override;
     vtkUserData lookup(QObject*, vtkUserData, bool mightBeEmpty=false) override;

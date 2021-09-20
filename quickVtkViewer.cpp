@@ -170,12 +170,12 @@ vtkRenderer* Viewer::myVtkObject(vtkUserData myUserData)
 }
 
 
-void Viewer::dispatch_async(std::function<void(vtkRenderWindow* renderWindow, vtkUserData renderData)>&& f, SharedData* d)
+void Viewer::dispatch_async(std::function<void(vtkRenderWindow* renderWindow, vtkUserData renderData)> f, SharedData* d)
 {    
     QQuickVtkItem::dispatch_async([
         pThis = QPointer<Viewer>(this),
-        f = std::move(f),
-        d = d]
+        f = f,
+        dispatchers = d->dispatchers()]
     (vtkRenderWindow* renderWindow, vtkUserData renderData)
     {
         if (!pThis) {
@@ -185,7 +185,7 @@ void Viewer::dispatch_async(std::function<void(vtkRenderWindow* renderWindow, vt
 
        f(renderWindow, renderData);
 
-       for(auto& p : d->dispatchers()) {
+       for(auto& p : dispatchers) {
            if (p) {
                auto viewer = qobject_cast<Viewer*>(p); if (viewer) {
                    if (pThis != viewer)
