@@ -177,7 +177,7 @@ void Actor::setMapper(Mapper* v)
             (vtkRenderWindow* renderWindow, vtkUserData renderData) mutable
             {
                 detachMapper(pThis, mapper, renderWindow, renderData);
-            });
+            }, this);
         }
     }
 
@@ -195,7 +195,7 @@ void Actor::setMapper(Mapper* v)
             (vtkRenderWindow* renderWindow, vtkUserData renderData) mutable
             {
                 attachMapper(pThis, mapper, renderWindow, renderData);
-            });
+            }, this);
         }
     }
 }

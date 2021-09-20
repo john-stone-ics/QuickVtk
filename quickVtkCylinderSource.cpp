@@ -19,7 +19,7 @@ CylinderSource::CylinderSource(QObject* parent) : PolyDataAlgorithm(parent)
         (vtkRenderWindow*, vtkUserData)
         {
             cylinderSource->SetCenter(center.data());
-        });
+        }, this);
     };
     connect(&m_center, &math::Vector3::xChanged, this, m_onCenterChanged);
     connect(&m_center, &math::Vector3::yChanged, this, m_onCenterChanged);
@@ -52,7 +52,7 @@ void CylinderSource::setHeight(qreal v, bool force)
         (vtkRenderWindow*, vtkUserData)
         {
             vtkCylinderSource->SetHeight(v);
-        });
+        }, this);
     }
 }
 
@@ -75,7 +75,7 @@ void CylinderSource::setRadius(qreal v, bool force)
         (vtkRenderWindow*, vtkUserData)
         {
             vtkCylinderSource->SetRadius(v);
-        });
+        }, this);
     }
 }
 
@@ -98,7 +98,7 @@ void CylinderSource::setResolution(qreal v, bool force)
         (vtkRenderWindow*, vtkUserData)
         {
             vtkCylinderSource->SetResolution(v);
-        });
+        }, this);
     }
 }
 
@@ -121,7 +121,7 @@ void CylinderSource::setCapping(qreal v, bool force)
         (vtkRenderWindow*, vtkUserData)
         {
             vtkCylinderSource->SetCapping(v);
-        });
+        }, this);
     }
 }
 

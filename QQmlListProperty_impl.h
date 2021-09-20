@@ -186,7 +186,7 @@ struct QQmlListProperty_impl
                 }
 
                 attachObject(pThis, object, index, renderWindow, renderData);
-            });
+            }, pThis);
         }
     }
 
@@ -262,7 +262,7 @@ struct QQmlListProperty_impl
                 }
 
                 detachObjects(pThis, renderData, list);
-            });
+            }, pThis);
         }
 
         for(auto object : *list)

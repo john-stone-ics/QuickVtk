@@ -25,6 +25,7 @@ namespace quick { namespace vtk {
 struct WeakDispatcherPtr;
 
 class Object;
+class SharedData;
 
 class Dispatcher
 {
@@ -34,7 +35,7 @@ public:
     // Note:  This class's methods will be called from both the gui-thread and render-thread (with gui-thread blocked)
 
     using vtkUserData = vtkSmartPointer<vtkObject>;
-    virtual void dispatch_async(std::function<void(vtkRenderWindow*, vtkUserData)>&&) = 0;
+    virtual void dispatch_async(std::function<void(vtkRenderWindow*, vtkUserData)>&&, SharedData*) = 0;
 
     virtual bool map(QObject*, vtkUserData, vtkUserData) = 0;
     virtual bool unmap(QObject*, vtkUserData) = 0;
@@ -81,19 +82,28 @@ struct WeakDispatcherPtr
 };
 #endif
 
-struct SharedData
+class SharedData
 {
-    virtual ~SharedData() = default;
+public:
+    SharedData();
+    virtual ~SharedData();
 
     void addVtkParent(QObject*);
     void delVtkParent(QObject*);
 
     Dispatcher* dispatcher();
+    QList<QPointer<QObject>> dispatchers();
 
     QAtomicInteger<bool> m_vtkInitialized = false;
 
 private:
     std::list<QPointer<QObject>> m_quickVtkParents;
+    bool findDispatchers(std::function<bool(Dispatcher*)>);
+    void refreshCaches();
+    Dispatcher*              m_dispatcher = nullptr;
+    QList<QPointer<QObject>> m_dispatchers;
+    bool                     m_dirtyCache = true;
+    static QSet<SharedData*> s_instances;
 };
 
 template<typename T>

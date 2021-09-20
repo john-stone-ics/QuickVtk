@@ -19,7 +19,7 @@ ConeSource::ConeSource(QObject* parent) : PolyDataAlgorithm(parent)
         (vtkRenderWindow*, vtkUserData)
         {
             coneSource->SetCenter(center.data());
-        });
+        }, this);
     };
     connect(&m_center, &math::Vector3::xChanged, this, m_onCenterChanged);
     connect(&m_center, &math::Vector3::yChanged, this, m_onCenterChanged);
@@ -36,7 +36,7 @@ ConeSource::ConeSource(QObject* parent) : PolyDataAlgorithm(parent)
         (vtkRenderWindow*, vtkUserData)
         {
             coneSource->SetDirection(direction.data());
-        });
+        }, this);
     };
     connect(&m_direction, &math::Vector3::xChanged, this, m_onDirectionChanged);
     connect(&m_direction, &math::Vector3::yChanged, this, m_onDirectionChanged);
@@ -75,7 +75,7 @@ void ConeSource::setHeight(qreal v, bool force)
 
             if (vtkConeSource->GetAngle() != pThis->m_angle)
                 emit pThis->angleChanged(pThis->m_angle = vtkConeSource->GetAngle());
-        });
+        }, this);
     }
 }
 
@@ -98,7 +98,7 @@ void ConeSource::setRadius(qreal v, bool force)
         (vtkRenderWindow*, vtkUserData)
         {
             vtkConeSource->SetRadius(v);
-        });
+        }, this);
     }
 }
 
@@ -125,7 +125,7 @@ void ConeSource::setAngle(qreal v, bool force)
 
             if (vtkConeSource->GetHeight() != pThis->m_height)
                 emit pThis->heightChanged(pThis->m_height = vtkConeSource->GetHeight());
-        });
+        }, this);
     }
 }
 
@@ -148,7 +148,7 @@ void ConeSource::setResolution(qreal v, bool force)
         (vtkRenderWindow*, vtkUserData)
         {
             vtkConeSource->SetResolution(v);
-        });
+        }, this);
     }
 }
 
@@ -171,7 +171,7 @@ void ConeSource::setCapping(qreal v, bool force)
         (vtkRenderWindow*, vtkUserData)
         {
             vtkConeSource->SetCapping(v);
-        });
+        }, this);
     }
 }
 

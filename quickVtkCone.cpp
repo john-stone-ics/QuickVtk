@@ -54,7 +54,7 @@ void Cone::setAngle(qreal v)
             }
 
             vtkCone->SetAngle(angle);
-        });
+        }, this);
     }
 }
 

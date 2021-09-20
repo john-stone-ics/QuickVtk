@@ -51,7 +51,7 @@ void Mapper::setScalarMode(enum ScalarMode v, bool force)
             }
 
             vtkMapper->SetScalarMode(int(v));
-        });
+        }, this);
     }
 }
 
@@ -93,7 +93,7 @@ void Mapper::setScalarVisibility(bool v, bool force)
             }
 
             vtkMapper->SetScalarMode(int(v));
-        });
+        }, this);
     }
 }
 

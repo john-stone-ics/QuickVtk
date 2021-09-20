@@ -7,6 +7,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkAbstractWidget.h>
 
+#include <QtQuick/QQuickWindow>
+
 #include <QtCore/QPointer>
 #include <QtCore/QDebug>
 #include <QtCore/QMutex>
@@ -168,9 +170,34 @@ vtkRenderer* Viewer::myVtkObject(vtkUserData myUserData)
 }
 
 
-void Viewer::dispatch_async(std::function<void(vtkRenderWindow* renderWindow, vtkUserData renderData)>&& f)
-{
-    QQuickVtkItem::dispatch_async(std::move(f));
+void Viewer::dispatch_async(std::function<void(vtkRenderWindow* renderWindow, vtkUserData renderData)>&& f, SharedData* d)
+{    
+    QQuickVtkItem::dispatch_async([
+        pThis = QPointer<Viewer>(this),
+        f = std::move(f),
+        d = d]
+    (vtkRenderWindow* renderWindow, vtkUserData renderData)
+    {
+        if (!pThis) {
+            qWarning() << "YIKES!!  I was deleted";
+            return;
+        }
+
+       f(renderWindow, renderData);
+
+       for(auto& p : d->dispatchers()) {
+           if (p) {
+               auto viewer = qobject_cast<Viewer*>(p); if (viewer) {
+                   if (pThis != viewer)
+                       viewer->scheduleRender();
+               } else {
+                   QString s; QDebug(&s) << p;
+                   qFatal("YIKES!! qobject_cast<Viewer*>(p) FAILED: %s", s.toStdString().c_str());
+               }
+           } else
+               qWarning() << "YIKES!! dispatcher was deleted";
+       }
+    });
 }
 
 bool Viewer::event(QEvent* ev)
