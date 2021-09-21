@@ -102,7 +102,10 @@ ApplicationWindow {
             input: vtksrc.currentValue
             onInputChanged: console.log("onInputChanged", this, input[0] ? input[0].objectName : "nope")
           }
-      }
+        }
+
+        Vtk.BoxWidget2 {
+        }
     }
 
     SequentialAnimation {

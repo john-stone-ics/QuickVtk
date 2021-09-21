@@ -38,7 +38,6 @@ set(QT_DIR ${Qt5_DIR})
 find_package(QT NAMES Qt5 COMPONENTS Core Quick REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick REQUIRED)
 find_package(Qt5Quick ${QT_MIN_VERSION} CONFIG REQUIRED Private)
-##JSS include_directories(${Qt${QT_VERSION_MAJOR}Quick_PRIVATE_INCLUDE_DIRS})
 #find_package(Qt5QuickCompiler QUIET)
 #if(Qt5QuickCompiler_FOUND AND NOT CMAKE_BUILD_TYPE MATCHES Debug AND NOT CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
 #  QTQUICK_COMPILER_ADD_RESOURCES(RESOURCES qml.qrc)
@@ -66,40 +65,50 @@ add_executable(${MYNAME}
   qml.qrc
   VtkSource.h
   VtkSource.cpp
-  quickVtkObject.h
-  quickVtkObject.cpp
-  quickVtkProp.h
-  quickVtkProp.cpp
-  quickVtkProp3D.h
-  quickVtkProp3D.cpp
-  quickVtkActor.h
-  quickVtkActor.cpp  
-  quickVtkAlgorithm.h
-  quickVtkAlgorithm.cpp
-  quickVtkAbstractMapper.h
+  quickMathVector3.cpp
+  quickMathVector3.h
   quickVtkAbstractMapper.cpp
-  quickVtkAbstractMapper3D.h
+  quickVtkAbstractMapper.h
   quickVtkAbstractMapper3D.cpp
-  quickVtkMapper.h
-  quickVtkMapper.cpp
-  quickVtkPolyDataAlgorithm.h
-  quickVtkPolyDataAlgorithm.cpp
-  quickVtkPolyDataMapper.h
-  quickVtkPolyDataMapper.cpp
-  quickVtkDispatcher.h
+  quickVtkAbstractMapper3D.h
+  quickVtkAbstractPicker.cpp
+  quickVtkAbstractPicker.h
+  quickVtkAbstractPropPicker.cpp
+  quickVtkAbstractPropPicker.h
+  quickVtkAbstractWidget.cpp
+  quickVtkAbstractWidget.h
+  quickVtkActor.cpp
+  quickVtkActor.h
+  quickVtkAlgorithm.cpp
+  quickVtkAlgorithm.h
+  quickVtkBoxWidget2.cpp
+  quickVtkBoxWidget2.h
+  quickVtkCone.cpp
+  quickVtkCone.h
+  quickVtkConeSource.cpp
+  quickVtkConeSource.h
+  quickVtkCylinderSource.cpp
+  quickVtkCylinderSource.h
   quickVtkDispatcher.cpp
+  quickVtkDispatcher.h
+  quickVtkImplicitFunction.cpp
+  quickVtkImplicitFunction.h
+  quickVtkMapper.cpp
+  quickVtkMapper.h
+  quickVtkObject.cpp
+  quickVtkObject.h
+  quickVtkPolyDataAlgorithm.cpp
+  quickVtkPolyDataAlgorithm.h
+  quickVtkPolyDataMapper.cpp
+  quickVtkPolyDataMapper.h
+  quickVtkProp.cpp
+  quickVtkProp.h
+  quickVtkProp3D.cpp
+  quickVtkProp3D.h
+  quickVtkPropPicker.cpp
+  quickVtkPropPicker.h
   quickVtkViewer.cpp
   quickVtkViewer.h
-  quickVtkCone.h
-  quickVtkCone.cpp
-  quickVtkConeSource.h
-  quickVtkConeSource.cpp
-  quickVtkCylinderSource.h
-  quickVtkCylinderSource.cpp
-  quickVtkImplicitFunction.h
-  quickVtkImplicitFunction.cpp
-  quickMathVector3.h
-  quickMathVector3.cpp
   qt-qml-models/QQmlVariantListModel.cpp
   qt-qml-models/QQmlVariantListModel.h
   qt-qml-models/QQmlObjectListModel.cpp
@@ -120,10 +129,10 @@ MODULES ${VTK_LIBRARIES}
 )
 
 target_include_directories(${MYNAME} PRIVATE Qt5Quick_PRIVATE_INCLUDE_DIRS)
-target_compile_definitions(${MYNAME} PRIVATE 
+target_compile_definitions(${MYNAME} PRIVATE
   $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
 )
-target_link_libraries(${MYNAME} PRIVATE 
+target_link_libraries(${MYNAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::QuickPrivate
 )
 
