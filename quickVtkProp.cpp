@@ -6,8 +6,6 @@ namespace quick { namespace vtk {
 namespace {
 struct MyVtkData : UserData<Prop>
 {
-    ~MyVtkData() { qDebug() << qobj; }
-
     vtkSmartPointer<vtkProp> prop;
 
     static MyVtkData* New() { return new MyVtkData; }

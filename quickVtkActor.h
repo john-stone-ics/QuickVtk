@@ -30,6 +30,7 @@ public:
 
 public:
     Actor(QObject* parent=nullptr);
+    ~Actor() override;
 
     vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkActor* myVtkObject(vtkUserData) const override;

@@ -17,6 +17,11 @@ Actor::Actor(QObject* parent) : Prop3D(parent)
     m_property.addVtkParent(this);
 }
 
+Actor::~Actor()
+{
+    m_property.delVtkParent(this);
+}
+
 namespace {
 void attachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, Actor::vtkUserData renderData)
 {

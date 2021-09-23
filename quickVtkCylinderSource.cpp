@@ -7,8 +7,6 @@ namespace quick { namespace vtk {
 
 CylinderSource::CylinderSource(QObject* parent) : PolyDataAlgorithm(parent)
 {
-    qDebug() << this;
-
     m_onCenterChanged = [this](double)
     {
         if (!m_vtkInitialized)
@@ -34,10 +32,10 @@ qreal CylinderSource::radius    () const { return m_radius;     }
 qreal CylinderSource::resolution() const { return m_resolution; }
 qreal CylinderSource::capping   () const { return m_capping;    }
 
-void CylinderSource::setHeight    (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &CylinderSource::m_height,     &CylinderSource::heightChanged,     &vtkCylinderSource::SetHeight);     }
-void CylinderSource::setRadius    (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &CylinderSource::m_radius,     &CylinderSource::radiusChanged,     &vtkCylinderSource::SetRadius);     }
-void CylinderSource::setResolution(qreal v, bool force) { QProperty_setter_impl2(v, force, this, &CylinderSource::m_resolution, &CylinderSource::resolutionChanged, &vtkCylinderSource::SetResolution); }
-void CylinderSource::setCapping   (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &CylinderSource::m_capping,    &CylinderSource::cappingChanged,    &vtkCylinderSource::SetCapping);    }
+void CylinderSource::setHeight    (qreal v, bool force) { QProperty_setter_impl(v, force, this, &CylinderSource::m_height,     &CylinderSource::heightChanged,     &vtkCylinderSource::SetHeight);     }
+void CylinderSource::setRadius    (qreal v, bool force) { QProperty_setter_impl(v, force, this, &CylinderSource::m_radius,     &CylinderSource::radiusChanged,     &vtkCylinderSource::SetRadius);     }
+void CylinderSource::setResolution(qreal v, bool force) { QProperty_setter_impl(v, force, this, &CylinderSource::m_resolution, &CylinderSource::resolutionChanged, &vtkCylinderSource::SetResolution); }
+void CylinderSource::setCapping   (qreal v, bool force) { QProperty_setter_impl(v, force, this, &CylinderSource::m_capping,    &CylinderSource::cappingChanged,    &vtkCylinderSource::SetCapping);    }
 
 CylinderSource::vtkUserData CylinderSource::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {

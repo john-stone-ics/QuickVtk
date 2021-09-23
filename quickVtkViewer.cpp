@@ -20,8 +20,6 @@ namespace quick { namespace vtk {
 namespace {
 struct MyVtkData : UserData<Viewer>
 {
-    ~MyVtkData() { qDebug() << qobj; }
-
     vtkSmartPointer<vtkRenderer> renderer;
 
     QMap<QObject*, Object::vtkUserData> map;
@@ -32,9 +30,7 @@ struct MyVtkData : UserData<Viewer>
 }
 
 Viewer::Viewer(QQuickItem* parent) : QQuickVtkItem(parent)
-{
-    qDebug() << this;
-}
+{}
 
 Viewer::~Viewer()
 {
@@ -139,8 +135,6 @@ QQmlListProperty<Object> Viewer::input()
 
 Viewer::vtkUserData Viewer::initializeVTK(vtkRenderWindow* renderWindow)
 {
-    qDebug() << this << m_vtkInitialized;
-
     auto vtk = vtkNew<MyVtkData>(this);
 
     vtk->renderer = vtkRenderer::New();

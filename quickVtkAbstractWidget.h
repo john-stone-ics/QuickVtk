@@ -15,7 +15,7 @@ public:
     bool enabled() const;
     void setEnabled(bool, bool=false);
     Q_SIGNAL void enabledChanged(bool);
-    bool m_enabled = false;
+    bool m_enabled = true;
 
 protected:
     AbstractWidget(QObject* parent);

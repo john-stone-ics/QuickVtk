@@ -7,8 +7,6 @@ namespace quick { namespace vtk {
 
 ConeSource::ConeSource(QObject* parent) : PolyDataAlgorithm(parent)
 {
-    qDebug() << this;
-
     m_onCenterChanged = [this]()
     {
         if (!m_vtkInitialized)
@@ -53,16 +51,16 @@ qreal ConeSource::radius    () const { return m_radius;     }
 qreal ConeSource::height    () const { return m_height;     }
 qreal ConeSource::angle     () const { return m_angle;      }
 
-void ConeSource::setResolution(qreal v, bool force) { QProperty_setter_impl2(v, force, this, &ConeSource::m_resolution, &ConeSource::resolutionChanged, &vtkConeSource::SetResolution); }
-void ConeSource::setCapping   (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &ConeSource::m_capping,    &ConeSource::cappingChanged,    &vtkConeSource::SetCapping); }
-void ConeSource::setRadius    (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &ConeSource::m_radius,     &ConeSource::radiusChanged,     &vtkConeSource::SetRadius);}
-void ConeSource::setHeight    (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &ConeSource::m_height,     &ConeSource::heightChanged,     &vtkConeSource::SetHeight, static_cast<void(*)(vtkConeSource*,ConeSource*)>(
+void ConeSource::setResolution(qreal v, bool force) { QProperty_setter_impl(v, force, this, &ConeSource::m_resolution, &ConeSource::resolutionChanged, &vtkConeSource::SetResolution); }
+void ConeSource::setCapping   (qreal v, bool force) { QProperty_setter_impl(v, force, this, &ConeSource::m_capping,    &ConeSource::cappingChanged,    &vtkConeSource::SetCapping); }
+void ConeSource::setRadius    (qreal v, bool force) { QProperty_setter_impl(v, force, this, &ConeSource::m_radius,     &ConeSource::radiusChanged,     &vtkConeSource::SetRadius);}
+void ConeSource::setHeight    (qreal v, bool force) { QProperty_setter_impl(v, force, this, &ConeSource::m_height,     &ConeSource::heightChanged,     &vtkConeSource::SetHeight, static_cast<void(*)(vtkConeSource*,ConeSource*)>(
     [](vtkConeSource* vtkConeSource, ConeSource* pThis) {
         if (pThis->m_angle != vtkConeSource->GetAngle())
             emit pThis->angleChanged(pThis->m_angle = vtkConeSource->GetAngle());
     }));
 }
-void ConeSource::setAngle     (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &ConeSource::m_angle,      &ConeSource::angleChanged,      &vtkConeSource::SetAngle, static_cast<void(*)(vtkConeSource*,ConeSource*)>(
+void ConeSource::setAngle     (qreal v, bool force) { QProperty_setter_impl(v, force, this, &ConeSource::m_angle,      &ConeSource::angleChanged,      &vtkConeSource::SetAngle, static_cast<void(*)(vtkConeSource*,ConeSource*)>(
     [](vtkConeSource* vtkConeSource, ConeSource* pThis) {
         if (pThis->m_height != vtkConeSource->GetHeight())
             emit pThis->heightChanged(pThis->m_height = vtkConeSource->GetHeight());

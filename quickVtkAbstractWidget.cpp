@@ -28,8 +28,6 @@ void AbstractWidget::setEnabled(bool v, bool force)
 
 AbstractWidget::vtkUserData AbstractWidget::initializeVTK(vtkRenderWindow*, vtkUserData renderData)
 {
-    qDebug() << m_vtkInitialized;
-
     auto vtk = vtkNew<MyVtkData>(this, renderData);
 
     vtk->abstractWidget = makeAbstractWidget();

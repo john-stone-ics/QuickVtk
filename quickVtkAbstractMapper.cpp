@@ -9,8 +9,6 @@ namespace quick { namespace vtk {
 namespace {
 struct MyVtkData : UserData<AbstractMapper>
 {
-    ~MyVtkData() { qDebug() << qobj; }
-
     vtkSmartPointer<vtkAbstractMapper> abstractMapper;
 
     static MyVtkData* New() { return new MyVtkData; }
