@@ -48,7 +48,7 @@ struct QQmlListProperty_impl
 
         auto objData = dispatcher->lookup(object, renderData, true);
 
-        if (!objData)
+        if (!objData && (object->isVolatile() || !object->m_vtkInitialized) )
             objData = object->initializeVTK(renderWindow, renderData);
 
         if (!objData && object->isVolatile()) {

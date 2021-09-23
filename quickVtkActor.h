@@ -2,6 +2,7 @@
 
 #include "quickVtkProp3D.h"
 #include "quickVtkProperty.h"
+#include "quickVtkTexture.h"
 
 #include <vtkActor.h>
 
@@ -27,6 +28,10 @@ public:
     Q_PROPERTY(quick::vtk::Property* property READ property CONSTANT);
     Property* property();
     Property m_property;
+
+    Q_PROPERTY(quick::vtk::Texture* texture READ texture CONSTANT);
+    Texture* texture();
+    Texture m_texture;
 
 public:
     Actor(QObject* parent=nullptr);

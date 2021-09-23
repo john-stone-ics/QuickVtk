@@ -92,6 +92,8 @@ add_executable(${MYNAME}
   quickVtkCylinderSource.h
   quickVtkDispatcher.cpp
   quickVtkDispatcher.h
+  quickVtkImageAlgorithm.cpp
+  quickVtkImageAlgorithm.h
   quickVtkImplicitFunction.cpp
   quickVtkImplicitFunction.h
   quickVtkMapper.cpp
@@ -108,8 +110,10 @@ add_executable(${MYNAME}
   quickVtkProp3D.h
   quickVtkPropPicker.cpp
   quickVtkPropPicker.h
-  quickVtkProperty.h
   quickVtkProperty.cpp
+  quickVtkProperty.h
+  quickVtkTexture.cpp
+  quickVtkTexture.h
   quickVtkViewer.cpp
   quickVtkViewer.h
   qt-qml-models/QQmlVariantListModel.cpp

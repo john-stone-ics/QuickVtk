@@ -23,7 +23,7 @@ public:
     Interpolation interpolation() const;
     void setInterpolation(Interpolation, bool=false);
     Q_SIGNAL void interpolationChanged(Interpolation);
-    Interpolation m_interpolation = Phong;
+    Interpolation m_interpolation = Gouraud;
 
     enum Representation {
         Points = VTK_POINTS,
@@ -59,13 +59,13 @@ public:
     bool shading() const;
     void setShading(bool, bool=false);
     Q_SIGNAL void shadingChanged(bool);
-    bool m_shading = true;
+    bool m_shading = false;
 
     Q_PROPERTY(bool lighting READ lighting WRITE setLighting NOTIFY lightingChanged)
     bool lighting() const;
     void setLighting(bool, bool=false);
     Q_SIGNAL void lightingChanged(bool);
-    bool m_lighting;
+    bool m_lighting = true;
 
     Q_PROPERTY(bool edgeVisibility READ edgeVisibility WRITE setEdgeVisibility NOTIFY edgeVisibilityChanged)
     bool edgeVisibility() const;
@@ -77,55 +77,61 @@ public:
     bool backfaceCulling() const;
     void setBackfaceCulling(bool, bool=false);
     Q_SIGNAL void backfaceCullingChanged(bool);
-    bool m_backfaceCulling = true;
+    bool m_backfaceCulling = false;
 
     Q_PROPERTY(bool frontfaceCulling READ frontfaceCulling WRITE setFrontfaceCulling NOTIFY frontfaceCullingChanged)
     bool frontfaceCulling() const;
     void setFrontfaceCulling(bool, bool=false);
     Q_SIGNAL void frontfaceCullingChanged(bool);
-    bool m_frontfaceCulling = true;
+    bool m_frontfaceCulling = false;
 
     Q_PROPERTY(QColor specularColor READ specularColor WRITE setSpecularColor NOTIFY specularColorChanged);
     QColor specularColor() const;
     void setSpecularColor(QColor, bool=false);
     Q_SIGNAL void specularColorChanged(QColor);
-    QColor m_specularColor;
+    QColor m_specularColor{255,255,255};
 
     Q_PROPERTY(QColor diffuseColor READ diffuseColor WRITE setDiffuseColor NOTIFY diffuseColorChanged);
     QColor diffuseColor() const;
     void setDiffuseColor(QColor, bool=false);
     Q_SIGNAL void diffuseColorChanged(QColor);
-    QColor m_diffuseColor;
+    QColor m_diffuseColor{255,255,255};
 
     Q_PROPERTY(QColor ambientColor READ ambientColor WRITE setAmbientColor NOTIFY ambientColorChanged);
     QColor ambientColor() const;
     void setAmbientColor(QColor, bool=false);
     Q_SIGNAL void ambientColorChanged(QColor);
-    QColor m_ambientColor;
+    QColor m_ambientColor{255,255,255};
 
     Q_PROPERTY(QColor edgeColor READ edgeColor WRITE setEdgeColor NOTIFY edgeColorChanged);
     QColor edgeColor() const;
     void setEdgeColor(QColor, bool=false);
     Q_SIGNAL void edgeColorChanged(QColor);
-    QColor m_edgeColor;
+    QColor m_edgeColor{0,0,0};
+
+    Q_PROPERTY(qreal diffuse READ diffuse WRITE setDiffuse NOTIFY diffuseChanged);
+    qreal diffuse() const;
+    void setDiffuse(qreal, bool=false);
+    Q_SIGNAL void diffuseChanged(qreal);
+    qreal m_diffuse = 1.0;
 
     Q_PROPERTY(qreal ambient READ ambient WRITE setAmbient NOTIFY ambientChanged);
     qreal ambient() const;
     void setAmbient(qreal, bool=false);
     Q_SIGNAL void ambientChanged(qreal);
-    qreal m_ambient = true;
+    qreal m_ambient = 0.0;
 
     Q_PROPERTY(qreal specular READ specular WRITE setSpecular NOTIFY specularChanged);
     qreal specular() const;
     void setSpecular(qreal, bool=false);
     Q_SIGNAL void specularChanged(qreal);
-    qreal m_specular = true;
+    qreal m_specular = 0.0;
 
     Q_PROPERTY(qreal specularPower READ specularPower WRITE setSpecularPower NOTIFY specularPowerChanged);
     qreal specularPower() const;
     void setSpecularPower(qreal, bool=false);
     Q_SIGNAL void specularPowerChanged(qreal);
-    qreal m_specularPower = true;
+    qreal m_specularPower = 1.0;
 
 public:
     vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;

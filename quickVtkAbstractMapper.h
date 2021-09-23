@@ -18,12 +18,13 @@ public:
     Q_SIGNAL void inputChanged();
     QList<Algorithm*> m_input;
 
+protected:
+    AbstractMapper(QObject* parent);
+
+public:
     vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkAbstractMapper* myVtkObject(vtkUserData) const override;
     bool isVolatile() const override;
-
-protected:
-    AbstractMapper(QObject* parent);
 
 private:
     vtkAlgorithm* makeAlgorithm() override;

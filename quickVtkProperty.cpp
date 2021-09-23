@@ -33,6 +33,7 @@ QColor                   Property::diffuseColor    () const { return m_diffuseCo
 QColor                   Property::ambientColor    () const { return m_ambientColor;     }
 QColor                   Property::edgeColor       () const { return m_edgeColor;        }
 qreal                    Property::ambient         () const { return m_ambient;          }
+qreal                    Property::diffuse         () const { return m_diffuse;          }
 qreal                    Property::specular        () const { return m_specular;         }
 qreal                    Property::specularPower   () const { return m_specularPower;    }
 
@@ -55,6 +56,7 @@ void Property::setDiffuseColor    (QColor                   v, bool force) { QPr
 void Property::setAmbientColor    (QColor                   v, bool force) { QProperty_setter_impl(v, force, this, &Property::m_ambientColor,     &Property::ambientColorChanged,     &vtkProperty::SetSpecularColor, qcolor2vtk);  }
 void Property::setEdgeColor       (QColor                   v, bool force) { QProperty_setter_impl(v, force, this, &Property::m_edgeColor,        &Property::edgeColorChanged,        &vtkProperty::SetSpecularColor, qcolor2vtk);  }
 void Property::setAmbient         (qreal                    v, bool force) { QProperty_setter_impl(v, force, this, &Property::m_ambient,          &Property::ambientChanged,          &vtkProperty::SetAmbient);                    }
+void Property::setDiffuse         (qreal                    v, bool force) { QProperty_setter_impl(v, force, this, &Property::m_diffuse,          &Property::diffuseChanged,          &vtkProperty::SetDiffuse);                    }
 void Property::setSpecular        (qreal                    v, bool force) { QProperty_setter_impl(v, force, this, &Property::m_specular,         &Property::specularChanged,         &vtkProperty::SetSpecular);                   }
 void Property::setSpecularPower   (qreal                    v, bool force) { QProperty_setter_impl(v, force, this, &Property::m_specularPower,    &Property::specularPowerChanged,    &vtkProperty::SetSpecularPower);              }
 
