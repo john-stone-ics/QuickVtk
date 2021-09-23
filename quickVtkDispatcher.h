@@ -5,27 +5,16 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QObject>
+#include <QtCore/QSet>
 #include <QtCore/QVector>
 #include <QtCore/QPointer>
-#if 0
-#include <QtCore/QThread>
 #include <QtCore/QAtomicInteger>
-#include <QtCore/QAtomicPointer>
-#include <QtCore/QRecursiveMutex>
-#include <QtCore/QExplicitlySharedDataPointer>
-#endif
-
-#include <list>
-#include <functional>
 
 class vtkRenderWindow;
 class vtkObject;
 
 namespace quick { namespace vtk {
 
-struct WeakDispatcherPtr;
-
-class Object;
 class SharedData;
 
 class Dispatcher
@@ -47,41 +36,7 @@ public:
     QSet<Observer*> m_aboutToBeDeleted;
 };
 
-#if 0
-struct StrongDispatcherPtr
-{
-    StrongDispatcherPtr(WeakDispatcherPtr&);
-
-    quick::vtk::Dispatcher* operator->();
-    operator quick::vtk::Dispatcher*();
-
-    struct Data : QSharedData {
-        Data(WeakDispatcherPtr&);
-        ~Data();
-        WeakDispatcherPtr& _wp;
-    };
-    QExplicitlySharedDataPointer<Data> d;
-};
-
-struct WeakDispatcherPtr
-{
-    WeakDispatcherPtr(quick::vtk::Dispatcher *);
-
-    StrongDispatcherPtr lock(bool canFail=false);
-    operator bool() const;
-
-    struct Data : QSharedData, Dispatcher::Observer {
-        Data(quick::vtk::Dispatcher*);
-        ~Data();
-        QRecursiveMutex         _m;
-        int                     _n = 0;
-        Qt::HANDLE              _t = nullptr;
-        quick::vtk::Dispatcher* _p = nullptr;
-        void aboutToBeDeleted() override;
-    };
-    QExplicitlySharedDataPointer<Data> d;
-};
-#endif
+/*-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-= */
 
 class SharedData
 {
@@ -106,6 +61,8 @@ private:
     bool                       m_dirtyCache = true;
     static QSet<SharedData*>   s_instances;
 };
+
+/*-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-= */
 
 template<typename T>
 struct UserData : vtkObject {

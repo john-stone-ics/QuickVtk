@@ -11,7 +11,7 @@ class Mapper : public AbstractMapper3D
     Q_OBJECT
 public:
 
-    enum class ScalarMode {
+    enum ScalarMode {
         ScalarModeDefault           = VTK_SCALAR_MODE_DEFAULT,
         ScalarModeUsePointData      = VTK_SCALAR_MODE_USE_POINT_DATA,
         ScalarModeUseCellData       = VTK_SCALAR_MODE_USE_CELL_DATA,
@@ -21,7 +21,7 @@ public:
     Q_ENUM(ScalarMode);
     Q_PROPERTY(quick::vtk::Mapper::ScalarMode scalarMode READ scalarMode WRITE setScalarMode NOTIFY scalarModeChanged)
     ScalarMode scalarMode() const;
-    void setScalarMode(enum ScalarMode, bool force=false);
+    void setScalarMode(ScalarMode, bool force=false);
     Q_SIGNAL void scalarModeChanged(enum ScalarMode);
     enum ScalarMode m_scalarMode = ScalarMode::ScalarModeDefault;
 

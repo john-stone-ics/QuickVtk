@@ -1,5 +1,6 @@
 #include "quickVtkCone.h"
 #include "quickVtkDispatcher.h"
+#include "QProperty_setter_impl.h"
 
 namespace quick { namespace vtk {
 
@@ -21,43 +22,10 @@ qreal Cone::angle() const
     return m_angle;
 }
 
-void Cone::setAngle(qreal v)
+void Cone::setAngle(qreal v, bool force)
 {
-    if (m_angle != v) {
-        emit angleChanged(m_angle = v);
-
-        if (!m_vtkInitialized)
-            return;
-
-        dispatcher()->dispatch_async([
-             pThis = QPointer<Cone>(this),
-             angle = v]
-        (vtkRenderWindow* renderWindow, vtkUserData renderData) mutable
-        {
-            auto dispatcher = pThis->dispatcher();
-
-            if (!dispatcher) {
-                qWarning() << "YIKES!! pThis->dispatcher() FAILED";
-                return;
-            }
-
-            auto myUserData = dispatcher->lookup(pThis, renderData);
-
-            if (!myUserData) {
-                return;
-            }
-
-            auto vtkCone = pThis->myVtkObject(myUserData);
-
-            if (!vtkCone) {
-                return;
-            }
-
-            vtkCone->SetAngle(angle);
-        }, this);
-    }
+    QProperty_setter_impl(v, force, this, &Cone::m_angle, &Cone::angleChanged, &vtkCone::SetAngle);
 }
-
 
 Cone::vtkUserData Cone::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
@@ -68,6 +36,8 @@ Cone::vtkUserData Cone::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData
     vtk->cone = vtkCone::New();
 
     m_vtkInitialized = true;
+
+    setAngle(m_angle, true);
 
     return vtk;
 }

@@ -44,18 +44,16 @@ QQmlListProperty<Algorithm> AbstractMapper::input()
 
 AbstractMapper::vtkUserData AbstractMapper::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
-    qDebug() << this << m_vtkInitialized;
-
     auto vtk = vtkNew<MyVtkData>(this, renderData);
 
     vtk->abstractMapper = makeAbstractMapper();
+
+    m_vtkInitialized = true;
 
     for(int index=0; index<m_input.count(); ++index) {
         auto& object = m_input.at(index);
         inputImpl.attachObject(this, object, index, renderWindow, renderData);
     }
-
-    m_vtkInitialized = true;
 
     return vtk;
 }

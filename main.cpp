@@ -34,7 +34,20 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
-    qSetMessagePattern("\033[35m%{threadid}\033[0m  \033[1m%{file}(%{line}): \033[34m%{function}\033[0m -- %{message}");
+    qSetMessagePattern(
+                "%{if-info}I%{endif}"
+                "%{if-debug}D%{endif}"
+                "%{if-warning}\033[31mW\033[0m%{endif}"
+                "%{if-critical}\033[31;mC\033[0m%{endif}"
+                "%{if-fatal}\033[31;mF\033[0m%{endif}"
+                "\033[34m %{threadid}\033[0m "
+                "%{if-info}%{message}%{endif}"
+                "%{if-debug}%{message}%{endif}"
+                "%{if-warning}\033[31m%{message}\033[0m%{endif}"
+                "%{if-critical}\033[31;m%{message}\033[0m%{endif}"
+                "%{if-fatal}\033[31;m%{message}\033[0m%{endif}"
+                " \033[1m\033[37m%{file}(%{line}):\033[0m "
+               );
     QGuiApplication app(argc, argv);
 
     app.setFont(QFont("Noto Sans"));

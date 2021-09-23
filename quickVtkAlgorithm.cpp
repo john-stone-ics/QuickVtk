@@ -65,15 +65,14 @@ QQmlListProperty<Algorithm> Algorithm::input()
 
 Algorithm::vtkUserData Algorithm::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
-    qDebug() << this << m_vtkInitialized;
-
     if (!m_vtkInitialized)
+    {
         m_vtkAlgorithm = makeAlgorithm();
+        m_vtkInitialized = true;
+    }
 
-    for(int i=0; i<m_input.count(); ++i)
+    for (int i=0; i<m_input.count(); ++i)
         attachToObject(m_vtkAlgorithm, m_input.at(i)->m_vtkAlgorithm, i);
-
-    m_vtkInitialized = true;
 
     return nullptr;
 }

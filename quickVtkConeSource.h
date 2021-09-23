@@ -16,12 +16,12 @@ public:
     Q_PROPERTY(quick::math::Vector3* center READ center CONSTANT);
     math::Vector3* center();
     math::Vector3 m_center{0,0,0};
-    std::function<void(double)> m_onCenterChanged
+    std::function<void()> m_onCenterChanged
 
     Q_PROPERTY(quick::math::Vector3* direction READ direction CONSTANT);
     math::Vector3* direction();
     math::Vector3 m_direction{1,0,0};
-    std::function<void(double)> m_onDirectionChanged
+    std::function<void()> m_onDirectionChanged
 
     Q_PROPERTY(qreal height READ height WRITE setHeight NOTIFY heightChanged);
     qreal height() const;

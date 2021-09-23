@@ -13,15 +13,19 @@ public:
 
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
     bool enabled() const;
-    void setEnabled(bool);
+    void setEnabled(bool, bool=false);
     Q_SIGNAL void enabledChanged(bool);
     bool m_enabled = false;
 
 protected:
     AbstractWidget(QObject* parent);
+    virtual vtkAbstractWidget* makeAbstractWidget() const = 0;
 
 public:
+    vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
+    vtkAbstractWidget* myVtkObject(vtkUserData) const override;
     bool isVolatile() const;
+
 };
 
 } }

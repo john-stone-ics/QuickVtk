@@ -1,6 +1,7 @@
 #pragma once
 
 #include "quickVtkProp3D.h"
+#include "quickVtkProperty.h"
 
 #include <vtkActor.h>
 
@@ -9,7 +10,6 @@ namespace quick { namespace vtk {
 class Dispatcher;
 class Mapper;
 class Texture;
-class Property;
 
 class Actor : public Prop3D {
     Q_OBJECT
@@ -17,7 +17,6 @@ class Actor : public Prop3D {
 public:
 
     //Q_PROPERTY(quick::Vtk::Texture* texture READ getTexture CONSTANT);
-    //Q_PROPERTY(quick::Vtk::Property* property READ getProperty CONSTANT);
 
     Q_PROPERTY(quick::vtk::Mapper* mapper READ mapper WRITE setMapper NOTIFY mapperChanged);
     Mapper* mapper() const;
@@ -25,12 +24,18 @@ public:
     Q_SIGNAL void mapperChanged(quick::vtk::Mapper*);
     Mapper* m_mapper = nullptr;
 
+    Q_PROPERTY(quick::vtk::Property* property READ property CONSTANT);
+    Property* property();
+    Property m_property;
+
 public:
     Actor(QObject* parent=nullptr);
 
     vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkActor* myVtkObject(vtkUserData) const override;
-    bool isVolatile() const override;
+
+protected:
+    vtkActor* makeProp() const override;
 };
 
 } }

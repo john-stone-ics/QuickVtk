@@ -12,92 +12,9 @@ void Dispatcher::aboutToBeDeleted()
         p->aboutToBeDeleted();
 }
 
-#if 0
-//
-/* ========================================================================= */
-//
 
-StrongDispatcherPtr::StrongDispatcherPtr(WeakDispatcherPtr& wp) : d(new Data(wp))
-{}
-StrongDispatcherPtr::Data::Data(WeakDispatcherPtr& wp) : _wp(wp)
-{
-    _wp.d->_m.lock();
+/*-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-=-==-=-=-=-=-= */
 
-    if (1 == ++wp.d->_n)
-        _wp.d->_t = QThread::currentThreadId();
-
-}
-StrongDispatcherPtr::Data::~Data()
-{
-    if (0 == --_wp.d->_n)
-        _wp.d->_t = 0;
-
-    _wp.d->_m.unlock();
-}
-quick::vtk::Dispatcher* StrongDispatcherPtr::operator->()
-{
-    return d->_wp.d->_p;
-}
-StrongDispatcherPtr::operator quick::vtk::Dispatcher *()
-{
-    return d->_wp.d->_p;
-}
-
-//
-/* ========================================================================= */
-//
-
-WeakDispatcherPtr::WeakDispatcherPtr(quick::vtk::Dispatcher* p) : d(new Data(p))
-{}
-
-WeakDispatcherPtr::Data::Data(quick::vtk::Dispatcher* p)
-{
-    if (!p)
-        return;
-
-    _m.lock();
-    _p = p;
-    _p->m_aboutToBeDeleted.insert(this);
-    _m.unlock();
-}
-
-void WeakDispatcherPtr::Data::aboutToBeDeleted()
-{
-    _m.lock();
-    if (QThread::currentThreadId() == _t)
-        qFatal("YIKES!! dispatcher aboutToBeDeleted() while a StrongDispatcherPtr still exists in the same thread");
-    _p = nullptr;
-    _m.unlock();
-}
-
-WeakDispatcherPtr::Data::~Data()
-{
-    if (_n)
-        qFatal("YIKES!! %s -- destroying while locked", Q_FUNC_INFO);
-
-    _m.lock();
-    if (_p) {
-        _p->m_aboutToBeDeleted.remove(this);
-        _p = nullptr;
-    }
-    _m.unlock();
-}
-
-StrongDispatcherPtr WeakDispatcherPtr::lock(bool canFail)
-{
-    if (!d)
-        qFatal("YIKES!! %s -- locking while uninitialized", Q_FUNC_INFO);
-
-    if (!d->_p && !canFail)
-        qFatal("YIKES!! %s -- locking a nullptr", Q_FUNC_INFO);
-
-    return StrongDispatcherPtr(*this);
-}
-#endif
-
-//
-/* ========================================================================= */
-//
 
 QSet<SharedData*> SharedData::s_instances;
 

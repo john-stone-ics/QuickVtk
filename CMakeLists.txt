@@ -57,6 +57,7 @@ message (STATUS "VTK_DIR: ${VTK_DIR}")
 message (STATUS "Qt5Quick_PRIVATE_INCLUDE_DIRS: ${Qt5Quick_PRIVATE_INCLUDE_DIRS}")
 
 add_executable(${MYNAME}
+  QProperty_setter_impl.h
   QQmlListProperty_impl.h
   main.cpp
   main.qml
@@ -107,6 +108,8 @@ add_executable(${MYNAME}
   quickVtkProp3D.h
   quickVtkPropPicker.cpp
   quickVtkPropPicker.h
+  quickVtkProperty.h
+  quickVtkProperty.cpp
   quickVtkViewer.cpp
   quickVtkViewer.h
   qt-qml-models/QQmlVariantListModel.cpp

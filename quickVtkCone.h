@@ -14,7 +14,7 @@ public:
 
     Q_PROPERTY(qreal angle READ angle WRITE setAngle NOTIFY angleChanged)
     qreal angle() const;
-    void setAngle(qreal);
+    void setAngle(qreal, bool=false);
     Q_SIGNAL void angleChanged(qreal);
     qreal m_angle;
 

@@ -13,7 +13,12 @@ vtkPolyDataMapper* PolyDataMapper::makeAbstractMapper() {
 
 vtkPolyDataMapper* PolyDataMapper::myVtkObject(Object::vtkUserData myUserData) const
 {
-    return vtkPolyDataMapper::SafeDownCast(Mapper::myVtkObject(myUserData));
+    auto vtkPolyDataMapper = vtkPolyDataMapper::SafeDownCast(Mapper::myVtkObject(myUserData));
+
+    if (!vtkPolyDataMapper)
+        qWarning() << "YIKES!! vtkPolyDataMapper::SafeDownCast(Mapper::myVtkObject(myUserData)) FAILED";
+
+    return vtkPolyDataMapper;
 }
 
 } }

@@ -96,15 +96,15 @@ ApplicationWindow {
         property bool selected: false
         onClicked: selected ^= 1
 
+        Vtk.BoxWidget2 {
+        }
+
         Vtk.Actor {
           Vtk.PolyDataMapper {
             id: polyDataMapper
             input: vtksrc.currentValue
             onInputChanged: console.log("onInputChanged", this, input[0] ? input[0].objectName : "nope")
           }
-        }
-
-        Vtk.BoxWidget2 {
         }
     }
 

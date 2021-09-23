@@ -12,9 +12,10 @@ class BoxWidget2 : public AbstractWidget
 public:
     BoxWidget2(QObject* parent = nullptr);
 
-public:
-    vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkBoxWidget2* myVtkObject(vtkUserData) const override;
+protected:
+    vtkBoxWidget2 *makeAbstractWidget() const override;
+
 };
 
 } }

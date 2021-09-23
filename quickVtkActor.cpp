@@ -12,44 +12,25 @@
 
 namespace quick { namespace vtk {
 
-namespace {
-struct MyVtkData : UserData<Actor>
-{
-    ~MyVtkData() { qDebug() << qobj; }
-
-    vtkSmartPointer<vtkActor> actor;
-
-    static MyVtkData* New() { return new MyVtkData; }
-    vtkTypeMacro(MyVtkData, vtkObject);
-};
-}
-
 Actor::Actor(QObject* parent) : Prop3D(parent)
 {
-    qDebug() << this;
+    m_property.addVtkParent(this);
 }
 
 namespace {
 void attachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, Actor::vtkUserData renderData)
 {
     if (!pThis) {
-        qWarning() << "YIKES!! pThis is nullptr";
+        qWarning() << "YIKES!! I was deleted";
         return;
     }
 
     if (!mapper) {
-        qWarning() << "YIKES!! mapper is nullptr";
+        qWarning() << "YIKES!! My mapper was deleted";
         return;
     }
 
-    auto dispatcher = pThis->dispatcher();
-
-    if (!dispatcher) {
-        qWarning() << "YIKES!! pThis->dispatcher() FAILED";
-        return;
-    }
-
-    auto mapperData = dispatcher->lookup(mapper, renderData, true);
+    auto mapperData = pThis->dispatcher()->lookup(mapper, renderData, true);
 
     if (!mapperData)
         mapperData = mapper->initializeVTK(renderWindow, renderData);
@@ -62,12 +43,7 @@ void attachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
     if (!vtkMapper)
         return;
 
-    auto myUserData = dispatcher->lookup(pThis, renderData);
-
-    if (!myUserData)
-        return;
-
-    auto vtkActor = pThis->myVtkObject(myUserData);
+    auto vtkActor = pThis->myVtkObject(pThis->dispatcher()->lookup(pThis, renderData));
 
     if (!vtkActor)
         return;
@@ -87,14 +63,7 @@ void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
         return;
     }
 
-    auto dispatcher = pThis->dispatcher();
-
-    if (!dispatcher) {
-        qWarning() << "YIKES!! pThis->dispatcher() FAILED";
-        return;
-    }
-
-    auto mapperData = dispatcher->lookup(mapper, renderData, true);
+    auto mapperData = pThis->dispatcher()->lookup(mapper, renderData, true);
 
     if (!mapperData)
         mapperData = mapper->initializeVTK(renderWindow, renderData);
@@ -107,12 +76,7 @@ void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
     if (!vtkMapper)
         return;
 
-    auto myUserData = dispatcher->lookup(pThis, renderData);
-
-    if (!myUserData)
-        return;
-
-    auto vtkActor = pThis->myVtkObject(myUserData);
+    auto vtkActor = pThis->myVtkObject(pThis->dispatcher()->lookup(pThis, renderData));
 
     if (!vtkActor)
         return;
@@ -122,41 +86,6 @@ void detachMapper(Actor* pThis, Mapper* mapper, vtkRenderWindow* renderWindow, A
 
     vtkActor->SetMapper(nullptr);
 }
-}
-
-Actor::vtkUserData Actor::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
-{
-    qDebug() << this << m_vtkInitialized;
-
-    auto vtk = vtkNew<MyVtkData>(this, renderData);
-
-    vtk->actor = vtkActor::New();
-
-    if (m_mapper)
-    {
-        attachMapper(this, m_mapper, renderWindow, renderData);
-    }
-
-    m_vtkInitialized = true;
-
-    return vtk;
-}
-
-vtkActor* Actor::myVtkObject(vtkUserData myUserData) const
-{
-    auto vtk = MyVtkData::SafeDownCast(myUserData);
-
-    if (!vtk) {
-        qWarning() << "YIKES!! MyVtkData::SafeDownCast(myUserData) FAILED";
-        return {};
-    }
-
-    return vtk->actor;
-}
-
-bool Actor::isVolatile() const
-{
-    return true;
 }
 
 Mapper* Actor::mapper() const { return m_mapper; }
@@ -198,6 +127,37 @@ void Actor::setMapper(Mapper* v)
             }, this);
         }
     }
+}
+
+Property* Actor::property() { return &m_property; }
+
+Actor::vtkUserData Actor::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
+{
+    m_property.initializeVTK(renderWindow, renderData);
+
+    auto vtk = Prop3D::initializeVTK(renderWindow, renderData);
+
+    if (m_mapper)
+    {
+        attachMapper(this, m_mapper, renderWindow, renderData);
+    }
+
+    return vtk;
+}
+
+vtkActor* Actor::myVtkObject(vtkUserData myUserData) const
+{
+    auto vtkActor = vtkActor::SafeDownCast(Prop3D::myVtkObject(myUserData));
+
+    if (!vtkActor)
+        qWarning() << "YIKES!! vtkActor::SafeDownCast(Prop3D::myVtkObject(myUserData)) FAILED";
+
+    return vtkActor;
+}
+
+vtkActor* Actor::makeProp() const
+{
+    return vtkActor::New();
 }
 
 

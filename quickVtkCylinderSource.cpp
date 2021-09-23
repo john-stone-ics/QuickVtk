@@ -1,4 +1,5 @@
 #include "quickVtkCylinderSource.h"
+#include "QProperty_setter_impl.h"
 
 #include <vtkSmartPointer.h>
 
@@ -33,97 +34,10 @@ qreal CylinderSource::radius    () const { return m_radius;     }
 qreal CylinderSource::resolution() const { return m_resolution; }
 qreal CylinderSource::capping   () const { return m_capping;    }
 
-void CylinderSource::setHeight(qreal v, bool force)
-{
-    if (m_height != v || force)
-    {
-        if (m_height != v)
-            emit heightChanged(m_height = v);
-
-        if (!m_vtkInitialized) {
-            if (force)
-                qFatal("!m_vtkInitialized && force==true");
-            return;
-        }
-
-        dispatcher()->dispatch_async([
-            vtkCylinderSource = vtkSmartPointer<vtkCylinderSource>(myVtkObject()),
-            v = v]
-        (vtkRenderWindow*, vtkUserData)
-        {
-            vtkCylinderSource->SetHeight(v);
-        }, this);
-    }
-}
-
-void CylinderSource::setRadius(qreal v, bool force)
-{
-    if (m_radius != v || force)
-    {
-        if (m_radius != v)
-            emit radiusChanged(m_radius = v);
-
-        if (!m_vtkInitialized) {
-            if (force)
-                qFatal("!m_vtkInitialized && force==true");
-            return;
-        }
-
-        dispatcher()->dispatch_async([
-            vtkCylinderSource = vtkSmartPointer<vtkCylinderSource>(myVtkObject()),
-            v = v]
-        (vtkRenderWindow*, vtkUserData)
-        {
-            vtkCylinderSource->SetRadius(v);
-        }, this);
-    }
-}
-
-void CylinderSource::setResolution(qreal v, bool force)
-{
-    if (m_resolution != v || force)
-    {
-        if (m_resolution != v)
-            emit resolutionChanged(m_resolution = v);
-
-        if (!m_vtkInitialized) {
-            if (force)
-                qFatal("!m_vtkInitialized && force==true");
-            return;
-        }
-
-        dispatcher()->dispatch_async([
-            vtkCylinderSource = vtkSmartPointer<vtkCylinderSource>(myVtkObject()),
-            v = v]
-        (vtkRenderWindow*, vtkUserData)
-        {
-            vtkCylinderSource->SetResolution(v);
-        }, this);
-    }
-}
-
-void CylinderSource::setCapping(qreal v, bool force)
-{
-    if (m_capping != v || force)
-    {
-        if (m_capping != v)
-            emit cappingChanged(m_capping = v);
-
-        if (!m_vtkInitialized) {
-            if (force)
-                qFatal("!m_vtkInitialized && force==true");
-            return;
-        }
-
-        dispatcher()->dispatch_async([
-            vtkCylinderSource = vtkSmartPointer<vtkCylinderSource>(myVtkObject()),
-            v = v]
-        (vtkRenderWindow*, vtkUserData)
-        {
-            vtkCylinderSource->SetCapping(v);
-        }, this);
-    }
-}
+void CylinderSource::setHeight    (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &CylinderSource::m_height,     &CylinderSource::heightChanged,     &vtkCylinderSource::SetHeight);     }
+void CylinderSource::setRadius    (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &CylinderSource::m_radius,     &CylinderSource::radiusChanged,     &vtkCylinderSource::SetRadius);     }
+void CylinderSource::setResolution(qreal v, bool force) { QProperty_setter_impl2(v, force, this, &CylinderSource::m_resolution, &CylinderSource::resolutionChanged, &vtkCylinderSource::SetResolution); }
+void CylinderSource::setCapping   (qreal v, bool force) { QProperty_setter_impl2(v, force, this, &CylinderSource::m_capping,    &CylinderSource::cappingChanged,    &vtkCylinderSource::SetCapping);    }
 
 CylinderSource::vtkUserData CylinderSource::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
