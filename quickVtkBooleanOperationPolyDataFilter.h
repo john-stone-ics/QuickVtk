@@ -39,7 +39,7 @@ public:
 
 public:
     vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
-    vtkBooleanOperationPolyDataFilter* myVtkObject(Object::vtkUserData=nullptr) const override;
+    vtkBooleanOperationPolyDataFilter* myVtkObject(Object::vtkUserData) const override;
 private:
     vtkBooleanOperationPolyDataFilter* makeAlgorithm() override;
 };

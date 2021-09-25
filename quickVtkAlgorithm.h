@@ -24,13 +24,11 @@ public:
     vtkAlgorithm* myVtkObject(vtkUserData) const override;
     bool isVolatile() const override;
 
-    vtkSmartPointer<vtkAlgorithm> m_vtkAlgorithm;
-
 protected:
     Algorithm(QObject* parent);
-
-private:
     virtual vtkAlgorithm* makeAlgorithm() = 0;    
+
+    vtkSmartPointer<vtkAlgorithm> m_vtkAlgorithm;
 };
 
 } }

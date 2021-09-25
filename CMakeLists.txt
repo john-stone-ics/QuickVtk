@@ -114,6 +114,8 @@ add_executable(${MYNAME}
   quickVtkPropPicker.h
   quickVtkProperty.cpp
   quickVtkProperty.h
+  quickVtkSphereSource.cpp
+  quickVtkSphereSource.h
   quickVtkTexture.cpp
   quickVtkTexture.h
   quickVtkViewer.cpp

@@ -16,7 +16,7 @@ public:
     Q_PROPERTY(quick::math::Vector3* center READ center CONSTANT);
     math::Vector3* center();
     math::Vector3 m_center{0,0,0};
-    std::function<void(double)> m_onCenterChanged
+    std::function<void()> m_onCenterChanged;
 
     Q_PROPERTY(qreal height READ height WRITE setHeight NOTIFY heightChanged);
     qreal height() const;
@@ -43,7 +43,7 @@ public:
     qreal m_capping = 1;
 
     vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
-    vtkCylinderSource* myVtkObject(Object::vtkUserData=nullptr) const override;
+    vtkCylinderSource* myVtkObject(Object::vtkUserData) const override;
     vtkCylinderSource* makeAlgorithm() override;
 };
 

@@ -19,39 +19,21 @@ struct MyVtkData : UserData<AbstractMapper>
 AbstractMapper::AbstractMapper(QObject* parent) : Algorithm(parent)
 {}
 
-namespace {
-void attachToObject(vtkSmartPointer<vtkAbstractMapper> parent, vtkSmartPointer<vtkAlgorithm> child, int index)
-{
-    parent->SetInputConnection(index, child->GetOutputPort());
-}
-
-void detachFromObject(vtkSmartPointer<vtkAbstractMapper> parent, vtkSmartPointer<vtkAlgorithm> child, int index)
-{
-    //TODO: figure out how to verify the existing connection here
-
-    parent->RemoveInputConnection(index, child->GetOutputPort());
-}
-
-QQmlListProperty_impl<AbstractMapper, vtkAbstractMapper, Algorithm, vtkAlgorithm, attachToObject, detachFromObject> inputImpl;
-}
-
-QQmlListProperty<Algorithm> AbstractMapper::input()
-{
-    return QQmlListProperty<Algorithm>(this, &m_input, inputImpl.append, inputImpl.count, inputImpl.at, inputImpl.clear);
-}
-
 AbstractMapper::vtkUserData AbstractMapper::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
 {
     auto vtk = vtkNew<MyVtkData>(this, renderData);
 
-    vtk->abstractMapper = makeAbstractMapper();
+    vtk->abstractMapper = vtkAbstractMapper::SafeDownCast(makeAlgorithm());
+
+    if (!vtk->abstractMapper)
+        qWarning() << "YIKES!! vtkAbstractMapper::SafeDownCast(makeAlgorithm()) FAILED";
 
     m_vtkInitialized = true;
 
-    for(int index=0; index<m_input.count(); ++index) {
-        auto& object = m_input.at(index);
-        inputImpl.attachObject(this, object, index, renderWindow, renderData);
-    }
+    auto shouldBeNullptr = Algorithm::initializeVTK(renderWindow, renderData);
+
+    if (shouldBeNullptr)
+        qWarning() << "YIKES!! Algorithm::initializeVTK(renderWindow, renderData) returned non-nullptr";
 
     return vtk;
 }
@@ -61,17 +43,11 @@ vtkAbstractMapper* AbstractMapper::myVtkObject(vtkUserData myUserData) const
     auto vtk = MyVtkData::SafeDownCast(myUserData);
 
     if (!vtk) {
-        qWarning() << "YIKES!! MyVtkData::SafeDownCast(myUserData) FAILED";
+        qWarning() << "MyVtkData::SafeDownCast(myUserData) FAILED";
         return {};
     }
 
     return vtk->abstractMapper;
-}
-
-vtkAlgorithm* AbstractMapper::makeAlgorithm()
-{
-    qFatal("YIKES!! %s makeAlgorithm() should never be called", Q_FUNC_INFO);
-    return nullptr;
 }
 
 bool AbstractMapper::isVolatile() const

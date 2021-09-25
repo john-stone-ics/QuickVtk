@@ -19,9 +19,17 @@ ImageAlgorithm::vtkUserData ImageAlgorithm::initializeVTK(vtkRenderWindow* rende
 {
     auto vtk = vtkNew<MyVtkData>(this, renderData);
 
-    vtk->imageAlgorithm = makeImageAlgorithm();
+    vtk->imageAlgorithm = vtkImageAlgorithm::SafeDownCast(makeAlgorithm());
+
+    if (!vtk->imageAlgorithm)
+        qWarning() << "YIKES!! vtkImageAlgorithm::SafeDownCast(makeAlgorithm()) FAILED";
 
     m_vtkInitialized = true;
+
+    auto shouldBeNullptr = Algorithm::initializeVTK(renderWindow, renderData);
+
+    if (shouldBeNullptr)
+        qWarning() << "YIKES!! Algorithm::initializeVTK(renderWindow, renderData) returned non-nullptr";
 
     return vtk;
 }
@@ -36,12 +44,6 @@ vtkImageAlgorithm* ImageAlgorithm::myVtkObject(vtkUserData myUserData) const
     }
 
     return vtk->imageAlgorithm;
-}
-
-vtkAlgorithm* ImageAlgorithm::makeAlgorithm()
-{
-    qFatal("YIKES!! %s makeAlgorithm() should never be called", Q_FUNC_INFO);
-    return nullptr;
 }
 
 bool ImageAlgorithm::isVolatile() const

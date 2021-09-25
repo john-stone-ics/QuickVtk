@@ -25,53 +25,58 @@ struct QQmlListProperty_impl
             return;
         }
 
-        auto myVtkData = dispatcher->lookup(pThis, renderData);
+        auto myVtkData = pThis->isVolatile() ? dispatcher->lookup(pThis, renderData) : nullptr;
 
-        if (!myVtkData) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "dispatcher(pThis, renderData) FAILED";
+        if (!myVtkData && pThis->isVolatile()) {
+            qWarning() << "YIKES!! dispatcher(pThis, renderData) FAILED";
+            return;
+        }
+
+        if (myVtkData && !pThis->isVolatile()) {
+            qWarning() << "YIKES!! dispatcher->lookup(pThis, renderData) returned data but object is non-volatile";
             return;
         }
 
         auto myVtkObject = pThis->myVtkObject(myVtkData);
 
         if (!myVtkObject) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << " pThis->myVtkObject(myVtkData) FAILED";
+            qWarning() << "YIKES!!  pThis->myVtkObject(myVtkData) FAILED";
             return;
         }
 
         auto myDownCastObject = MyVtk::SafeDownCast(myVtkObject);
 
         if (!myDownCastObject) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "MyVtk::SafeDownCast(myVtkObject) FAILED";
+            qWarning() << "YIKES!! MyVtk::SafeDownCast(myVtkObject) FAILED";
             return;
         }
 
         auto objData = dispatcher->lookup(object, renderData, true);
 
-        if (!objData && (object->isVolatile() || !object->m_vtkInitialized) )
+        if (!objData)
             objData = object->initializeVTK(renderWindow, renderData);
 
         if (!objData && object->isVolatile()) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "object->initializeVTK() FAILED";
+            qWarning() << "YIKES!! object->initializeVTK() FAILED";
             return;
         }
 
         if (objData && !object->isVolatile()) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "object->myVtkObject(objData) returned data but object is non-volatile";
+            qWarning() << "YIKES!! dispatcher->lookup(object, renderData) returned data but object is non-volatile";
             return;
         }
 
         auto objVtkObject = object->myVtkObject(objData);
 
         if (!objVtkObject) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "object->myVtkObject(objData) FAILED";
+            qWarning() << "YIKES!! object->myVtkObject(objData) FAILED";
             return;
         }
 
         auto objDownCastObject = ObjVtk::SafeDownCast(objVtkObject);
 
         if (!objDownCastObject) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "ObjVtk::SafeDownCast(objVtkObject) FAILED";
+            qWarning() << "YIKES!! ObjVtk::SafeDownCast(objVtkObject) FAILED";
             return;
         }
 
@@ -83,28 +88,33 @@ struct QQmlListProperty_impl
         auto dispatcher = pThis->dispatcher();
 
         if (!dispatcher) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << pThis << "pThis->m_dispatcher() FAILED";
+            qWarning() << "YIKES!! pThis->m_dispatcher() FAILED";
             return;
         }
 
         auto myVtkData = dispatcher->lookup(pThis, renderData);
 
-        if (!myVtkData) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "dispatcher(pThis, renderData) FAILED";
+        if (!myVtkData && pThis->isVolatile()) {
+            qWarning() << "YIKES!! dispatcher(pThis, renderData) FAILED";
+            return;
+        }
+
+        if (myVtkData && !pThis->isVolatile()) {
+            qWarning() << "YIKES!! dispatcher->lookup(pThis, renderData) returned data but object is non-volatile";
             return;
         }
 
         auto myVtkObject = pThis->myVtkObject(myVtkData);
 
         if (!myVtkObject) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << " pThis->myVtkObject(myVtkData) FAILED";
+            qWarning() << "YIKES!! pThis->myVtkObject(myVtkData) FAILED";
             return;
         }
 
         auto myDownCastObject = MyVtk::SafeDownCast(myVtkObject);
 
         if (!myDownCastObject) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "MyVtk::SafeDownCast(myVtkObject) FAILED";
+            qWarning() << "YIKES!! MyVtk::SafeDownCast(myVtkObject) FAILED";
             return;
         }
 
@@ -112,31 +122,36 @@ struct QQmlListProperty_impl
         {
             auto& object = list.at(index);
 
-            auto objUserData = dispatcher->lookup(object, renderData, !object->isVolatile());
+            auto objData = dispatcher->lookup(object, renderData, !object->isVolatile());
 
-            if (!objUserData && object->isVolatile()) {
-                qWarning() << "YIKES!!" << Q_FUNC_INFO << "dispatcher->lookup(object, renderData) FAILED";
-                continue;
+            if (!objData && object->isVolatile()) {
+                qWarning() << "YIKES!! object->initializeVTK() FAILED";
+                return;
             }
 
-            auto objVtkObject = object->myVtkObject(objUserData);
+            if (objData && !object->isVolatile()) {
+                qWarning() << "YIKES!! dispatcher->lookup(object, renderData) returned data but object is non-volatile";
+                return;
+            }
+
+            auto objVtkObject = object->myVtkObject(objData);
 
             if (!objVtkObject) {
-                qWarning() << "YIKES!!" << Q_FUNC_INFO << "object->myVtkObject(objUserData) FAILED";
+                qWarning() << "YIKES!! object->myVtkObject(objUserData) FAILED";
                 continue;
             }
 
             auto objDownCastObject = ObjVtk::SafeDownCast(objVtkObject);
 
             if (!objDownCastObject) {
-                qWarning() << "YIKES!!" << Q_FUNC_INFO << "ObjVtk::SafeDownCast(objVtkObject) FAILED";
+                qWarning() << "YIKES!! ObjVtk::SafeDownCast(objVtkObject) FAILED";
                 return;
             }
 
             Rf(myDownCastObject, objDownCastObject, index);
 
             if (object->isVolatile() && !dispatcher->unmap(object, ObjVtk::SafeDownCast(objVtkObject))) {
-                qWarning().nospace() << "YIKES!! " << Q_FUNC_INFO << " dispatcher->unmap(object, renderData) FAILED";
+                qWarning().nospace() << "YIKES!!   dispatcher->unmap(object, renderData) FAILED";
                 continue;
             }
         }
@@ -147,19 +162,24 @@ struct QQmlListProperty_impl
         auto pThis = qobject_cast<MyT*>(l->object);
 
         if (!pThis) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "qobject_cast<MyT*>(l->object) FAILED";
+            qWarning() << "YIKES!! qobject_cast<MyT*>(l->object) FAILED";
             return;
         }
 
         auto* list = reinterpret_cast<QList<ObjT*>*>(l->data);
 
         if (!list) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
+            qWarning() << "YIKES!! reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
             return;
         }
 
         if (list->contains(object)) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "appending an object already in the input list";
+            qWarning() << "YIKES!! appending an object already in the input list";
+            return;
+        }
+
+        if (!object) {
+            qWarning() << "YIKES!! QML passed us a nullptr for append(.., object), pThis:" << pThis;
             return;
         }
 
@@ -167,7 +187,7 @@ struct QQmlListProperty_impl
         object->addVtkParent(pThis);
         emit pThis->inputChanged();
 
-        if (!pThis->m_vtkInitialized)
+        if (pThis->m_vtkInitialized)
         {
             pThis->dispatcher()->dispatch_async([
                 pThis  = QPointer<MyT>(pThis),
@@ -176,12 +196,12 @@ struct QQmlListProperty_impl
             (vtkRenderWindow* renderWindow, typename ObjT::vtkUserData renderData) mutable
             {
                 if (!pThis) {
-                    qWarning() << "YIKES!!" << Q_FUNC_INFO << "I was deleted";
+                    qWarning() << "YIKES!! I was deleted";
                     return;
                 }
 
                 if (!object) {
-                    qWarning() << "YIKES!!" << Q_FUNC_INFO << "object was deleted";
+                    qWarning() << "YIKES!! object was deleted";
                     return;
                 }
 
@@ -195,14 +215,14 @@ struct QQmlListProperty_impl
         auto pThis = qobject_cast<MyT*>(l->object);
 
         if (!pThis) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "qobject_cast<ObjT*>(l->object) FAILED";
+            qWarning() << "YIKES!! qobject_cast<ObjT*>(l->object) FAILED";
             return -1;
         }
 
         auto* list = reinterpret_cast<QList<ObjT*>*>(l->data);
 
         if (!list) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
+            qWarning() << "YIKES!! reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
             return -1;
         }
 
@@ -214,19 +234,19 @@ struct QQmlListProperty_impl
         auto pThis = qobject_cast<MyT*>(l->object);
 
         if (!pThis) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "qobject_cast<ObjT*>(l->object) FAILED";
+            qWarning() << "YIKES!! qobject_cast<ObjT*>(l->object) FAILED";
             return nullptr;
         }
 
         auto* list = reinterpret_cast<QList<ObjT*>*>(l->data);
 
         if (!list) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
+            qWarning() << "YIKES!! reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
             return nullptr;
         }
 
         if (i<0 || i>=list->count()) {
-            qWarning().nospace() << "YIKES!! " << Q_FUNC_INFO << " i(" << i << ") is out of bounds [" << 0 << "," << list->count() << "]";
+            qWarning().nospace() << "YIKES!!   i(" << i << ") is out of bounds [" << 0 << "," << list->count() << "]";
             return nullptr;
         }
 
@@ -238,14 +258,14 @@ struct QQmlListProperty_impl
         auto pThis = qobject_cast<MyT*>(l->object);
 
         if (!pThis) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "qobject_cast<ObjT*>(l->object) FAILED";
+            qWarning() << "YIKES!! qobject_cast<ObjT*>(l->object) FAILED";
             return;
         }
 
         auto* list = reinterpret_cast<QList<ObjT*>*>(l->data);
 
         if (!list) {
-            qWarning() << "YIKES!!" << Q_FUNC_INFO << "reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
+            qWarning() << "YIKES!! reinterpret_cast<QList<ObjT*>*>(l->data) FAILED";
             return;
         }
 
@@ -257,7 +277,7 @@ struct QQmlListProperty_impl
             (vtkRenderWindow* renderWindow, typename ObjT::vtkUserData renderData) mutable
             {
                 if (!pThis) {
-                    qWarning() << "YIKES!!" << Q_FUNC_INFO << "I was deleted";
+                    qWarning() << "YIKES!! I was deleted";
                     return;
                 }
 

@@ -1,4 +1,5 @@
 #include "quickVtkAlgorithm.h"
+#include "QQmlListProperty_impl.h"
 
 #include <vtkAlgorithm.h>
 
@@ -21,52 +22,12 @@ void detachFromObject(vtkSmartPointer<vtkAlgorithm> parent, vtkSmartPointer<vtkA
     parent->RemoveInputConnection(index, child->GetOutputPort());
 }
 
-static void append(QQmlListProperty<Algorithm>* l, Algorithm* object)
-{
-    if (object->isVolatile()) {
-        qWarning() << "YIKES!! attempted to attach a volatile object to this non-volatile algorithm";
-        return;
-    }
-
-    auto pThis = qobject_cast<Algorithm*>(l->object);
-    auto* list = reinterpret_cast<QList<Algorithm*>*>(l->data);
-
-    list->append(object);
-    object->addVtkParent(pThis);
-
-    if (pThis->m_vtkInitialized)
-    {
-        attachToObject(pThis->m_vtkAlgorithm, object->m_vtkAlgorithm, list->count());
-    }
-}
-static int count(QQmlListProperty<Algorithm>* l)
-{
-    return reinterpret_cast<QList<Algorithm*>*>(l->data)->count();
-}
-static Algorithm* at(QQmlListProperty<Algorithm>* l, int i)
-{
-    return reinterpret_cast<QList<Algorithm*>*>(l->data)->at(i);
-}
-static void clear(QQmlListProperty<Algorithm>* l)
-{
-    auto pThis = qobject_cast<Algorithm*>(l->object);
-    auto* list = reinterpret_cast<QList<Algorithm*>*>(l->data);
-
-    if (pThis->m_vtkInitialized)
-    {
-        for (int i=0; i<list->count(); ++i) {
-            list->at(i)->delVtkParent(pThis);
-            detachFromObject(pThis->m_vtkAlgorithm, list->at(i)->m_vtkAlgorithm, i);
-        }
-    }
-
-    return list->clear();
-}
+QQmlListProperty_impl<Algorithm, vtkAlgorithm, Algorithm, vtkAlgorithm, attachToObject, detachFromObject> inputImpl;
 }
 
 QQmlListProperty<Algorithm> Algorithm::input()
 {
-    return QQmlListProperty<Algorithm>(this, &m_input, append, count, at, clear);
+    return QQmlListProperty<Algorithm>(this, &m_input, inputImpl.append, inputImpl.count, inputImpl.at, inputImpl.clear);
 }
 
 Algorithm::vtkUserData Algorithm::initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData)
@@ -77,8 +38,10 @@ Algorithm::vtkUserData Algorithm::initializeVTK(vtkRenderWindow* renderWindow, v
         m_vtkInitialized = true;
     }
 
-    for (int i=0; i<m_input.count(); ++i)
-        attachToObject(m_vtkAlgorithm, m_input.at(i)->m_vtkAlgorithm, i);
+    for(int index=0; index<m_input.count(); ++index) {
+        auto& object = m_input.at(index);
+        inputImpl.attachObject(this, object, index, renderWindow, renderData);
+    }
 
     return nullptr;
 }

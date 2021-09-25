@@ -57,11 +57,11 @@ public:
     Q_SIGNAL void interpolateChanged(bool);
     bool m_interpolate = false;
 
+public:
+    vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkTexture* myVtkObject(vtkUserData) const override;
 
 private:
-
-    vtkTexture* makeImageAlgorithm() override;
-
+    vtkTexture* makeAlgorithm() override;
 };
 } }

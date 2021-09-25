@@ -36,6 +36,7 @@ public:
     bool unmap(QObject*, vtkUserData) override;
     vtkUserData lookup(QObject*, vtkUserData, bool mightBeEmpty=false) override;
     vtkRenderer* myVtkObject(vtkUserData);
+    bool isVolatile() const;
 
     // input property
     Q_PROPERTY(QQmlListProperty<quick::vtk::Object> input READ input NOTIFY inputChanged);

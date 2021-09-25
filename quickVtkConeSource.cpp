@@ -13,7 +13,7 @@ ConeSource::ConeSource(QObject* parent) : PolyDataAlgorithm(parent)
             return;
 
        dispatcher()->dispatch_async([
-            coneSource = vtkSmartPointer<vtkConeSource>(myVtkObject()),
+            coneSource = vtkSmartPointer<vtkConeSource>(myVtkObject(nullptr)),
             center = m_center.m_values]
         (vtkRenderWindow*, vtkUserData)
         {
@@ -30,7 +30,7 @@ ConeSource::ConeSource(QObject* parent) : PolyDataAlgorithm(parent)
             return;
 
        dispatcher()->dispatch_async([
-            coneSource = vtkSmartPointer<vtkConeSource>(myVtkObject()),
+            coneSource = vtkSmartPointer<vtkConeSource>(myVtkObject(nullptr)),
             direction = m_direction.m_values]
         (vtkRenderWindow*, vtkUserData)
         {
@@ -81,6 +81,7 @@ ConeSource::vtkUserData ConeSource::initializeVTK(vtkRenderWindow* renderWindow,
 
     return myUserData;
 }
+
 vtkConeSource* ConeSource::myVtkObject(Object::vtkUserData myUserData) const
 {
     auto vtkConeSource = vtkConeSource::SafeDownCast(PolyDataAlgorithm::myVtkObject(myUserData));

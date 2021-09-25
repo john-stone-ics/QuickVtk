@@ -5,9 +5,6 @@ namespace quick { namespace vtk {
 PolyDataMapper::PolyDataMapper(QObject* parent) : Mapper(parent)
 {}
 
-vtkPolyDataMapper* PolyDataMapper::makeAbstractMapper() {
-    return vtkPolyDataMapper::New();
-}
 
 vtkPolyDataMapper* PolyDataMapper::myVtkObject(Object::vtkUserData myUserData) const
 {
@@ -17,6 +14,10 @@ vtkPolyDataMapper* PolyDataMapper::myVtkObject(Object::vtkUserData myUserData) c
         qWarning() << "YIKES!! vtkPolyDataMapper::SafeDownCast(Mapper::myVtkObject(myUserData)) FAILED";
 
     return vtkPolyDataMapper;
+}
+
+vtkPolyDataMapper* PolyDataMapper::makeAlgorithm() {
+    return vtkPolyDataMapper::New();
 }
 
 } }

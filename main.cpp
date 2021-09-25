@@ -6,6 +6,7 @@
 #include "quickVtkConeSource.h"
 #include "quickVtkCylinderSource.h"
 #include "quickVtkPolyDataMapper.h"
+#include "quickVtkSphereSource.h"
 #include "quickVtkViewer.h"
 
 #include "QtQmlTricksPlugin_SmartDataModels.h"
@@ -73,6 +74,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<quick::vtk::Prop                          >("Vtk", 1, 0, "Prop",                     "!!");
     qmlRegisterUncreatableType<quick::vtk::Prop3D                        >("Vtk", 1, 0, "Prop3D",                   "!!");
     qmlRegisterUncreatableType<quick::vtk::Property                      >("Vtk", 1, 0, "Property",                 "!!");
+    qmlRegisterType           <quick::vtk::SphereSource                  >("Vtk", 1, 0, "SphereSource"                  );
     qmlRegisterUncreatableType<quick::vtk::Texture                       >("Vtk", 1, 0, "Texture",                  "!!");
     qmlRegisterType           <quick::vtk::Viewer                        >("Vtk", 1, 0, "Viewer"                        );
 

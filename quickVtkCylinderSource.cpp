@@ -7,13 +7,13 @@ namespace quick { namespace vtk {
 
 CylinderSource::CylinderSource(QObject* parent) : PolyDataAlgorithm(parent)
 {
-    m_onCenterChanged = [this](double)
+    m_onCenterChanged = [this]()
     {
         if (!m_vtkInitialized)
             return;
 
         dispatcher()->dispatch_async([
-            cylinderSource = vtkSmartPointer<vtkCylinderSource>(myVtkObject()),
+            cylinderSource = vtkSmartPointer<vtkCylinderSource>(myVtkObject(nullptr)),
             center = m_center.m_values]
         (vtkRenderWindow*, vtkUserData)
         {
@@ -41,7 +41,7 @@ CylinderSource::vtkUserData CylinderSource::initializeVTK(vtkRenderWindow* rende
 {
     auto myUserData = PolyDataAlgorithm::initializeVTK(renderWindow, renderData);
 
-    m_onCenterChanged(0);
+    m_onCenterChanged();
     setHeight(m_height, true);
     setRadius(m_radius, true);
     setResolution(m_resolution, true);

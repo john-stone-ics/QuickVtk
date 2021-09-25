@@ -163,6 +163,10 @@ vtkRenderer* Viewer::myVtkObject(vtkUserData myUserData)
     return vtk->renderer;
 }
 
+bool Viewer::isVolatile() const
+{
+    return true;
+}
 
 void Viewer::dispatch_async(std::function<void(vtkRenderWindow* renderWindow, vtkUserData renderData)> f, SharedData* d)
 {    

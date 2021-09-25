@@ -24,8 +24,7 @@ protected:
 public:
     vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkAbstractWidget* myVtkObject(vtkUserData) const override;
-    bool isVolatile() const;
-
+    bool isVolatile() const override;
 };
 
 } }

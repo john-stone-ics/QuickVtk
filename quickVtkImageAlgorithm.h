@@ -11,13 +11,9 @@ class ImageAlgorithm : public Algorithm {
 protected:
     ImageAlgorithm(QObject* parent);
 public:
-    vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
+    vtkUserData initializeVTK(vtkRenderWindow* renderWindow, vtkUserData renderData) override;
     vtkImageAlgorithm* myVtkObject(vtkUserData) const override;
     bool isVolatile() const override;
-
-    vtkAlgorithm* makeAlgorithm() override;
-
-    virtual vtkImageAlgorithm* makeImageAlgorithm() = 0;
 };
 
 } }

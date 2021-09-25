@@ -96,19 +96,21 @@ ApplicationWindow {
         property bool selected: false
         onClicked: selected ^= 1
 
+//        data: Vtk.CylinderSource { id: cylinder }
+
         Vtk.Actor {
           Vtk.PolyDataMapper {
+            scalarVisibility: false
             Vtk.BooleanOperationPolyDataFilter {
-                input: [
-                  vtksrc.currentValue,
-                  Vtk.CylinderSource
-                ]
+              operation: Vtk.BooleanOperationPolyDataFilter.Difference
+//              input: [ vtksrc.currentValue, cylinder ]
+              Vtk.SphereSource {}
+              Vtk.ConeSource {}
             }
           }
         }
 
-        Vtk.BoxWidget2 {
-        }
+//        Vtk.BoxWidget2 {}
 
     }
 
