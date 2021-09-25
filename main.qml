@@ -98,8 +98,12 @@ ApplicationWindow {
 
         Vtk.Actor {
           Vtk.PolyDataMapper {
-            id: polyDataMapper
-            input: vtksrc.currentValue
+            Vtk.BooleanOperationPolyDataFilter {
+                input: [
+                  vtksrc.currentValue,
+                  Vtk.CylinderSource
+                ]
+            }
           }
         }
 

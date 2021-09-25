@@ -82,6 +82,8 @@ add_executable(${MYNAME}
   quickVtkActor.h
   quickVtkAlgorithm.cpp
   quickVtkAlgorithm.h
+  quickVtkBooleanOperationPolyDataFilter.cpp
+  quickVtkBooleanOperationPolyDataFilter.h
   quickVtkBoxWidget2.cpp
   quickVtkBoxWidget2.h
   quickVtkCone.cpp

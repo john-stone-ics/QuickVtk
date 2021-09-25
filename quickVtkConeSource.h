@@ -53,8 +53,10 @@ public:
     Q_SIGNAL void cappingChanged(qreal);
     qreal m_capping = 1;
 
+public:
     vtkUserData initializeVTK(vtkRenderWindow*, vtkUserData) override;
     vtkConeSource* myVtkObject(Object::vtkUserData=nullptr) const override;
+private:
     vtkConeSource* makeAlgorithm() override;
 };
 

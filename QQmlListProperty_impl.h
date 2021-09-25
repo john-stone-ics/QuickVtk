@@ -167,7 +167,7 @@ struct QQmlListProperty_impl
         object->addVtkParent(pThis);
         emit pThis->inputChanged();
 
-        if (pThis->m_vtkInitialized)
+        if (!pThis->m_vtkInitialized)
         {
             pThis->dispatcher()->dispatch_async([
                 pThis  = QPointer<MyT>(pThis),

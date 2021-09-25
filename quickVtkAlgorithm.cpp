@@ -34,7 +34,10 @@ static void append(QQmlListProperty<Algorithm>* l, Algorithm* object)
     list->append(object);
     object->addVtkParent(pThis);
 
-    attachToObject(pThis->m_vtkAlgorithm, object->m_vtkAlgorithm, list->count());
+    if (pThis->m_vtkInitialized)
+    {
+        attachToObject(pThis->m_vtkAlgorithm, object->m_vtkAlgorithm, list->count());
+    }
 }
 static int count(QQmlListProperty<Algorithm>* l)
 {
@@ -49,9 +52,12 @@ static void clear(QQmlListProperty<Algorithm>* l)
     auto pThis = qobject_cast<Algorithm*>(l->object);
     auto* list = reinterpret_cast<QList<Algorithm*>*>(l->data);
 
-    for(int i=0; i<list->count(); ++i) {
-        list->at(i)->delVtkParent(pThis);
-        detachFromObject(pThis->m_vtkAlgorithm, list->at(i)->m_vtkAlgorithm, i);
+    if (pThis->m_vtkInitialized)
+    {
+        for (int i=0; i<list->count(); ++i) {
+            list->at(i)->delVtkParent(pThis);
+            detachFromObject(pThis->m_vtkAlgorithm, list->at(i)->m_vtkAlgorithm, i);
+        }
     }
 
     return list->clear();

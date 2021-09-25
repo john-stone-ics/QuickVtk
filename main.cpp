@@ -1,10 +1,11 @@
-#include "quickVtkPolyDataMapper.h"
+#include "quickVtkActor.h"
+#include "quickVtkAlgorithm.h"
+#include "quickVtkBooleanOperationPolyDataFilter.h"
+#include "quickVtkBoxWidget2.h"
+#include "quickVtkCone.h"
 #include "quickVtkConeSource.h"
 #include "quickVtkCylinderSource.h"
-#include "quickVtkAlgorithm.h"
-#include "quickVtkBoxWidget2.h"
-#include "quickVtkActor.h"
-#include "quickVtkCone.h"
+#include "quickVtkPolyDataMapper.h"
 #include "quickVtkViewer.h"
 
 #include "QtQmlTricksPlugin_SmartDataModels.h"
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
 {
 //    qputenv("QML_IMPORT_TRACE","1");
 
-    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::OpenGL);
+    QQuickWindow::setSceneGraphBackend(QSGRendererInterface::OpenGLRhi);
     QSurfaceFormat::setDefaultFormat(QVTKRenderWindowAdapter::defaultFormat());
 
 #if defined(Q_OS_WIN)
@@ -52,24 +53,28 @@ int main(int argc, char *argv[])
 
     app.setFont(QFont("Noto Sans"));
 
-    qmlRegisterType           <quick::math::Vector3              >("Math",1, 0, "Vector3"                );
-    qmlRegisterUncreatableType<quick::vtk::AbstractWidget        >("Vtk", 1, 0, "AbstractWidget",    "!!");
-    qmlRegisterUncreatableType<quick::vtk::AbstractMapper        >("Vtk", 1, 0, "AbstractMapper",    "!!");
-    qmlRegisterUncreatableType<quick::vtk::AbstractMapper3D      >("Vtk", 1, 0, "AbstractMapper3D",  "!!");
-    qmlRegisterType           <quick::vtk::Actor                 >("Vtk", 1, 0, "Actor"                  );
-    qmlRegisterUncreatableType<quick::vtk::Algorithm             >("Vtk", 1, 0, "Algorithm",         "!!");
-    qmlRegisterType           <quick::vtk::BoxWidget2            >("Vtk", 1, 0, "BoxWidget2"             );
-    qmlRegisterType           <quick::vtk::Cone                  >("Vtk", 1, 0, "Cone"                   );
-    qmlRegisterType           <quick::vtk::ConeSource            >("Vtk", 1, 0, "ConeSource"             );
-    qmlRegisterType           <quick::vtk::CylinderSource        >("Vtk", 1, 0, "CylinderSource"         );
-    qmlRegisterUncreatableType<quick::vtk::ImplicitFunction      >("Vtk", 1, 0, "ImplicitFunction",  "!!");
-    qmlRegisterUncreatableType<quick::vtk::Mapper                >("Vtk", 1, 0, "Mapper",            "!!");
-    qmlRegisterUncreatableType<quick::vtk::Object                >("Vtk", 1, 0, "Object",            "!!");
-    qmlRegisterUncreatableType<quick::vtk::PolyDataAlgorithm     >("Vtk", 1, 0, "PolyDataAlgorithm", "!!");
-    qmlRegisterType           <quick::vtk::PolyDataMapper        >("Vtk", 1, 0, "PolyDataMapper"         );
-    qmlRegisterUncreatableType<quick::vtk::Prop                  >("Vtk", 1, 0, "Prop",              "!!");
-    qmlRegisterUncreatableType<quick::vtk::Prop3D                >("Vtk", 1, 0, "Prop3D",            "!!");
-    qmlRegisterType           <quick::vtk::Viewer                >("Vtk", 1, 0, "Viewer"                 );
+    qmlRegisterType           <quick::math::Vector3                      >("Math",1, 0, "Vector3"                       );
+    qmlRegisterUncreatableType<quick::vtk::AbstractMapper                >("Vtk", 1, 0, "AbstractMapper",           "!!");
+    qmlRegisterUncreatableType<quick::vtk::AbstractMapper3D              >("Vtk", 1, 0, "AbstractMapper3D",         "!!");
+    qmlRegisterUncreatableType<quick::vtk::AbstractWidget                >("Vtk", 1, 0, "AbstractWidget",           "!!");
+    qmlRegisterType           <quick::vtk::Actor                         >("Vtk", 1, 0, "Actor"                         );
+    qmlRegisterUncreatableType<quick::vtk::Algorithm                     >("Vtk", 1, 0, "Algorithm",                "!!");
+    qmlRegisterType           <quick::vtk::BooleanOperationPolyDataFilter>("Vtk", 1, 0, "BooleanOperationPolyDataFilter");
+    qmlRegisterType           <quick::vtk::BoxWidget2                    >("Vtk", 1, 0, "BoxWidget2"                    );
+    qmlRegisterType           <quick::vtk::Cone                          >("Vtk", 1, 0, "Cone"                          );
+    qmlRegisterType           <quick::vtk::ConeSource                    >("Vtk", 1, 0, "ConeSource"                    );
+    qmlRegisterType           <quick::vtk::CylinderSource                >("Vtk", 1, 0, "CylinderSource"                );
+    qmlRegisterUncreatableType<quick::vtk::ImageAlgorithm                >("Vtk", 1, 0, "ImageAlgorithm",           "!!");
+    qmlRegisterUncreatableType<quick::vtk::ImplicitFunction              >("Vtk", 1, 0, "ImplicitFunction",         "!!");
+    qmlRegisterUncreatableType<quick::vtk::Mapper                        >("Vtk", 1, 0, "Mapper",                   "!!");
+    qmlRegisterUncreatableType<quick::vtk::Object                        >("Vtk", 1, 0, "Object",                   "!!");
+    qmlRegisterUncreatableType<quick::vtk::PolyDataAlgorithm             >("Vtk", 1, 0, "PolyDataAlgorithm",        "!!");
+    qmlRegisterType           <quick::vtk::PolyDataMapper                >("Vtk", 1, 0, "PolyDataMapper"                );
+    qmlRegisterUncreatableType<quick::vtk::Prop                          >("Vtk", 1, 0, "Prop",                     "!!");
+    qmlRegisterUncreatableType<quick::vtk::Prop3D                        >("Vtk", 1, 0, "Prop3D",                   "!!");
+    qmlRegisterUncreatableType<quick::vtk::Property                      >("Vtk", 1, 0, "Property",                 "!!");
+    qmlRegisterUncreatableType<quick::vtk::Texture                       >("Vtk", 1, 0, "Texture",                  "!!");
+    qmlRegisterType           <quick::vtk::Viewer                        >("Vtk", 1, 0, "Viewer"                        );
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
