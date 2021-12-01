@@ -1,5 +1,6 @@
 #pragma once
 
+#include "QQuickVtkItem.h"
 #include "quickVtkDispatcher.h"
 #include "quickVtkObject.h"
 
@@ -14,7 +15,6 @@ class vtkRenderer;
 
 #include <private/qquickevents_p_p.h> // for QQuickMouseEvent
 
-#include <QQuickVtkItem.h>
 
 namespace quick { namespace vtk {
 

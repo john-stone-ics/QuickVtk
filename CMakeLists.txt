@@ -57,12 +57,12 @@ message (STATUS "VTK_DIR: ${VTK_DIR}")
 message (STATUS "Qt5Quick_PRIVATE_INCLUDE_DIRS: ${Qt5Quick_PRIVATE_INCLUDE_DIRS}")
 
 add_executable(${MYNAME}
+  QQuickVtkItem.cpp
+  QQuickVtkItem.h
   QProperty_setter_impl.h
   QQmlListProperty_impl.h
   main.cpp
   main.qml
-  DataStore.cpp
-  DataStore.h
   qml.qrc
   VtkSource.h
   VtkSource.cpp
@@ -118,26 +118,16 @@ add_executable(${MYNAME}
   quickVtkSphereSource.h
   quickVtkTexture.cpp
   quickVtkTexture.h
+  quickVtkTriangleFilter.cpp
+  quickVtkTriangleFilter.h
   quickVtkViewer.cpp
   quickVtkViewer.h
-  qt-qml-models/QQmlVariantListModel.cpp
-  qt-qml-models/QQmlVariantListModel.h
-  qt-qml-models/QQmlObjectListModel.cpp
-  qt-qml-models/QQmlObjectListModel.h
-  qt-qml-models/QtQmlTricksPlugin_SmartDataModels.h
   dynamicsplitview/DynamicSplitView.qml
   )
 
-target_include_directories(${MYNAME} PRIVATE
-    qt-qml-models
-)
-
 target_link_libraries(${MYNAME} PRIVATE ${VTK_LIBRARIES})
 # vtk_module_autoinit is needed
-vtk_module_autoinit(
-TARGETS ${MYNAME}
-MODULES ${VTK_LIBRARIES}
-)
+vtk_module_autoinit( TARGETS ${MYNAME} MODULES ${VTK_LIBRARIES} )
 
 target_include_directories(${MYNAME} PRIVATE Qt5Quick_PRIVATE_INCLUDE_DIRS)
 target_compile_definitions(${MYNAME} PRIVATE
