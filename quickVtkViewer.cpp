@@ -138,6 +138,7 @@ Viewer::vtkUserData Viewer::initializeVTK(vtkRenderWindow* renderWindow)
     auto vtk = vtkNew<MyVtkData>(this);
 
     vtk->renderer = vtkRenderer::New();
+    vtk->renderer->SetBackground(.7,.7,.7);
 
     renderWindow->AddRenderer(vtk->renderer);
 
