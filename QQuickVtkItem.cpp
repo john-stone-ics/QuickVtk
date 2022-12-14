@@ -145,16 +145,18 @@ public:
         iren->SetRenderWindow(vtkWindow);
         vtkNew<vtkInteractorStyleTrackballCamera> style;
         iren->SetInteractorStyle(style);
+        vtkUserData = item->initializeVTK(vtkWindow);
+        if (auto ia = vtkWindow->GetInteractor(); ia && !QVTKInteractor::SafeDownCast(ia)) {
+            qWarning().nospace() << "QQuickVTKItem.cpp:" << __LINE__ << ", YIKES!! Only QVTKInteractor is supported";
+            return;
+        }
         vtkWindow->SetReadyForRendering(false);
-        iren->Initialize();
+        vtkWindow->GetInteractor()->Initialize();
         vtkWindow->SetMapped(true);
         vtkWindow->SetIsCurrent(true);
         vtkWindow->SetForceMaximumHardwareLineWidth(1);
         vtkWindow->SetOwnContext(false);
         vtkWindow->OpenGLInitContext();
-
-        // Create and initialize the user data
-        vtkUserData = item->initializeVTK(vtkWindow);
     }
 
     void scheduleRender()
@@ -221,7 +223,7 @@ QSGNode* QQuickVtkItem::updatePaintNode(QSGNode* node, UpdatePaintNodeData*)
     if (!n) {
         auto api = window()->rendererInterface()->graphicsApi();
         if (api != QSGRendererInterface::OpenGL && api != QSGRendererInterface::OpenGLRhi) {
-            qWarning().nospace() << "QQuickVTKItem.cpp:" << __LINE__ << ", Unsupported graphicsApi(): " << api;
+            qWarning().nospace() << "QQuickVTKItem.cpp:" << __LINE__ << ", YIKES!! Unsupported graphicsApi(): " << api;
             return nullptr;
         }
         if (!d->node) {
@@ -254,17 +256,25 @@ QSGNode* QQuickVtkItem::updatePaintNode(QSGNode* node, UpdatePaintNodeData*)
     if (d->asyncDispatch.size()) {
         n->scheduleRender();
 
+        n->vtkWindow->SetReadyForRendering(true);
         while (d->asyncDispatch.size())
             d->asyncDispatch.dequeue()(n->vtkWindow, n->vtkUserData);
+        n->vtkWindow->SetReadyForRendering(false);
     }
     
     // Whenever the size changes we need to get a new FBO from VTK so we need to render right now (with the gui-thread blocked) for this one frame.
     if (dirtySize) {
         n->scheduleRender();
         n->render();
-        GLuint texId = n->vtkWindow->GetDisplayFramebuffer()->GetColorAttachmentAsTextureObject(0)->GetHandle();
-        auto texture = window()->createTextureFromNativeObject(QQuickWindow::NativeObjectTexture, &texId, 0, sz.toSize(), QQuickWindow::TextureHasAlphaChannel);
-        n->setTexture(texture);
+        if (auto fb = n->vtkWindow->GetDisplayFramebuffer(); fb && fb->GetNumberOfColorAttachments() > 0) {
+            GLuint texId = fb->GetColorAttachmentAsTextureObject(0)->GetHandle();
+            auto texture = window()->createTextureFromNativeObject(QQuickWindow::NativeObjectTexture, &texId, 0, sz.toSize(), QQuickWindow::TextureHasAlphaChannel);
+            n->setTexture(texture);
+        } else if (!fb)
+            qWarning().nospace() << "QQuickVTKItem.cpp:" << __LINE__ << ", YIKES!!, Render() didn't create a FrameBuffer!?";
+        else
+            qWarning().nospace() << "QQuickVTKItem.cpp:" << __LINE__ << ", YIKES!!, Render() didn't create any ColorBufferAttachements to its FrameBuffer!?";
+
     }
 
     n->setTextureCoordinatesTransform(QSGSimpleTextureNode::MirrorVertically);
